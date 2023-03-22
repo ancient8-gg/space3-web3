@@ -14,7 +14,7 @@ contract A8NFT is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
 
     constructor() ERC721("A8 NFT", "A8") {}
 
-    function safeMint(address to, string memory uri) public onlyOwner {
+    function safeMint(address to, string memory uri) external onlyOwner {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);

@@ -26,7 +26,7 @@ contract Space3 is ERC1155, AccessControl, ERC1155Burnable, ERC1155Supply {
         uint256 amount,
         string memory url,
         bytes memory data
-    ) public onlyRole(MINTER_ROLE) {
+    ) external onlyRole(MINTER_ROLE) {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
 
@@ -40,7 +40,7 @@ contract Space3 is ERC1155, AccessControl, ERC1155Burnable, ERC1155Supply {
         uint256[] memory ids,
         uint256[] memory amounts,
         bytes memory data
-    ) public onlyRole(MINTER_ROLE) {
+    ) external onlyRole(MINTER_ROLE) {
         _mintBatch(to, ids, amounts, data);
     }
 
