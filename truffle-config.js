@@ -73,7 +73,18 @@ module.exports = {
       timeoutBlocks: 200000,
       skipDryRun: true,
     },
-
+    roninTestnet: {
+      networkCheckTimeout: 100000,
+      provider: () =>
+        new HDWalletProvider({
+          privateKeys: [privateKey],
+          providerOrUrl: `https://saigon-testnet.roninchain.com/rpc`,
+        }),
+      network_id: 40925,
+      confirmations: 5,
+      timeoutBlocks: 200000,
+      skipDryRun: true,
+    },
     //
     // goerli: {
     //   provider: () => new HDWalletProvider(mnemonic, `https://goerli.infura.io/v3/${infuraProjectId}`),
