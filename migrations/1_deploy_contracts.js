@@ -26,5 +26,7 @@ module.exports = async function (deployer, network, accounts) {
     // await upgradeProxy(Space3ProxyAddress, Space3, { deployer, kind: 'uups', unsafeAllowRenames: true });
   } else if (network === "roninTestnet") {
     await deployer.deploy(Space3);
+  } else if (network === "a8Testnet") {
+    await deployer.deploy(Space3);
   }
 };
