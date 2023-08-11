@@ -85,6 +85,18 @@ module.exports = {
       timeoutBlocks: 200000,
       skipDryRun: true,
     },
+    a8Testnet: {
+      networkCheckTimeout: 100000,
+      provider: () =>
+        new HDWalletProvider({
+          privateKeys: [privateKey],
+          providerOrUrl: 'https://rpc-testnet.ancient8.gg',
+        }),
+      network_id: 2863311531,
+      confirmations: 5,
+      timeoutBlocks: 200000,
+      skipDryRun: true,
+    }
     //
     // goerli: {
     //   provider: () => new HDWalletProvider(mnemonic, `https://goerli.infura.io/v3/${infuraProjectId}`),
