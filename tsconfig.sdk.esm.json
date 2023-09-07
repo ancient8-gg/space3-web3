@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "ES2020",
+    "moduleResolution": "Node",
+    "rootDir": "./sdk/typescript/",
+    "outDir": "./build/sdk/typescript/esm"
+  },
+  "include": [
+    "sdk/typescript/",
+  ]
+}

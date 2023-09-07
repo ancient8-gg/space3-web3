@@ -1,24 +1,41 @@
 {
-    "name": "a8nft",
-    "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "author": "",
-    "license": "ISC",
-    "dependencies": {
-        "@openzeppelin/contracts": "^4.5.0",
-        "@openzeppelin/contracts-upgradeable": "^4.4.2",
-        "@openzeppelin/truffle-upgrades": "^1.15.0",
-        "@truffle/hdwallet-provider": "^2.0.0",
-        "@umaprotocol/truffle-ledger-provider": "^1.0.5",
-        "dotenv": "^16.0.3",
-        "truffle-contract-size": "^2.0.1",
-        "web3": "^1.6.1"
-    },
-    "devDependencies": {
-        "truffle-plugin-verify": "^0.5.20"
-    }
+  "name": "@space3/web3",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/sdk/typescript/cjs/index.js",
+  "module": "build/sdk/typescript/esm/index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "prebuild": "rm -rf build",
+    "sdk:ts:build:cjs": "tsc -p tsconfig.sdk.cjs.json",
+    "sdk:ts:build:esm": "tsc -p tsconfig.sdk.esm.json",
+    "sdk:ts:build": "yarn prebuild && yarn sdk:ts:build:cjs && yarn sdk:ts:build:esm"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.9.3"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
+    "@nomicfoundation/hardhat-ethers": "^3.0.0",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+    "@nomicfoundation/hardhat-verify": "^1.0.0",
+    "@typechain/ethers-v6": "^0.4.0",
+    "@typechain/hardhat": "^8.0.0",
+    "@types/chai": "^4.2.0",
+    "@types/mocha": ">=9.1.0",
+    "@types/node": ">=16.0.0",
+    "chai": "^4.2.0",
+    "ethers": "^6.4.0",
+    "hardhat": "^2.17.2",
+    "hardhat-deploy": "^0.11.37",
+    "hardhat-deploy-ethers": "^0.4.1",
+    "hardhat-gas-reporter": "^1.0.9",
+    "solidity-coverage": "^0.8.0",
+    "ts-node": ">=8.0.0",
+    "typechain": "^8.1.0",
+    "typescript": ">=4.5.0"
+  }
 }
