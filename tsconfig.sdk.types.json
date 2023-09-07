@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./sdk/typescript/",
+    "outDir": "./build/sdk/typescript/esm",
+    "declaration": true,
+    "declarationMap": true,
+    "declarationDir": "./build/sdk/typescript/types",
+    "emitDeclarationOnly": true,
+    "moduleResolution": "node"
+  },
+  "include": [
+    "sdk/typescript/",
+  ]
+}
