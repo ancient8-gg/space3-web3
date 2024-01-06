@@ -1,0 +1,18 @@
+branches:
+  - main
+  - name: canary
+    prerelease: rc
+  - 11-sc-refactor-web3-repository
+plugins:
+  -
+    - "@semantic-release/commit-analyzer"
+    - preset: conventionalcommits
+      releaseRules:
+        - type: refactor
+          release: patch
+        - type: styles
+          release: patch
+  - "@semantic-release/release-notes-generator"
+  - "@semantic-release/changelog"
+  - "@semantic-release/npm"
+  - "@semantic-release/git"
