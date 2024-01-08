@@ -8,37 +8,27 @@ import "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 
 import "../interfaces/IGachaStation.sol";
 
 contract GachaStation is IGachaStation, Ownable {
     using Address for address;
     using SafeMath for uint256;
+    using Counters for Counters.Counter;
 
     /* ============= Structs ============= */
     struct Reward {
-        address tokenAddress;
+        uint256 id;
         uint256 tokenId;
         uint256 amount;
+        address tokenAddr;
         string tokenType; // "ERC20", "ERC721", "ERC1155"
-        bool isClaimed;
     }
 
+    Counters.Counter private _rewardIdCounter;
     mapping(address => Reward[]) private _rewards;
-
-    /* ============= Events ============== */
-    event OwnerOf(
-        address indexed user,
-        address tokenAddress,
-        uint256 tokenId,
-        uint256 amount
-    );
-    event Claimed(
-        address indexed user,
-        address tokenAddress,
-        uint256 tokenId,
-        uint256 amount
-    );
+    mapping(uint256 => uint256) private _claimedBitMap;
 
     /* =========== Constructor =========== */
     constructor() {}
@@ -49,39 +39,40 @@ contract GachaStation is IGachaStation, Ownable {
      */
     function setRewardOwner(
         address user,
-        address tokenAddress,
+        address tokenAddr,
         uint256 tokenId,
         uint256 amount,
-        string memory tokenType
-    ) public override onlyOwner {
+        string calldata tokenType
+    ) external override onlyOwner returns (uint256) {
+        uint256 id = _rewardIdCounter.current();
+        _rewardIdCounter.increment();
         Reward memory reward = Reward(
-            tokenAddress,
+            id,
             tokenId,
             amount,
-            tokenType,
-            false
+            tokenAddr,
+            tokenType
         );
         _rewards[user].push(reward);
-        emit OwnerOf(msg.sender, tokenAddress, tokenId, amount);
+        emit OwnerOf(id, tokenId, amount, tokenAddr, msg.sender);
+        return id;
     }
 
     /**
      * @dev Function to claim reward by eligible user
-     * @param index The index of reward
+     * @param idx The index of reward
      */
-    function claim(uint256 index) external {
-        require(index < _rewards[msg.sender].length, "Invalid reward!");
-        require(!_rewards[msg.sender][index].isClaimed, "Already claimed!");
-
-        Reward storage reward = _rewards[msg.sender][index];
-        reward.isClaimed = true;
+    function claim(uint256 idx) external {
+        require(!isClaimed(idx), "Already claimed!");
+        Reward storage reward = _rewards[msg.sender][idx];
+        _setClaimed(idx);
         _distributeReward(msg.sender, reward);
-
         emit Claimed(
-            msg.sender,
-            reward.tokenAddress,
+            idx,
             reward.tokenId,
-            reward.amount
+            reward.amount,
+            reward.tokenAddr,
+            msg.sender
         );
     }
 
@@ -91,15 +82,19 @@ contract GachaStation is IGachaStation, Ownable {
      * @param reward The reward to distribute
      */
     function _distributeReward(address to, Reward memory reward) internal {
-        if (keccak256(bytes(reward.tokenType)) == keccak256(bytes("ERC20"))) {
+        if (reward.tokenAddr == address(0)) {
+            payable(to).transfer(reward.amount);
+        } else if (
+            keccak256(bytes(reward.tokenType)) == keccak256(bytes("ERC20"))
+        ) {
             require(
-                IERC20(reward.tokenAddress).transfer(to, reward.amount),
+                IERC20(reward.tokenAddr).transfer(to, reward.amount),
                 "Transfer failed"
             );
         } else if (
             keccak256(bytes(reward.tokenType)) == keccak256(bytes("ERC721"))
         ) {
-            IERC721(reward.tokenAddress).safeTransferFrom(
+            IERC721(reward.tokenAddr).safeTransferFrom(
                 address(this),
                 to,
                 reward.tokenId
@@ -107,7 +102,7 @@ contract GachaStation is IGachaStation, Ownable {
         } else if (
             keccak256(bytes(reward.tokenType)) == keccak256(bytes("ERC1155"))
         ) {
-            IERC1155(reward.tokenAddress).safeTransferFrom(
+            IERC1155(reward.tokenAddr).safeTransferFrom(
                 address(this),
                 to,
                 reward.tokenId,
@@ -115,6 +110,22 @@ contract GachaStation is IGachaStation, Ownable {
                 ""
             );
         }
+    }
+
+    function isClaimed(uint256 idx) public view override returns (bool) {
+        uint256 claimedWordIndex = idx / 256;
+        uint256 claimedBitIndex = idx % 256;
+        uint256 claimedWord = _claimedBitMap[claimedWordIndex];
+        uint256 mask = (1 << claimedBitIndex);
+        return claimedWord & mask == mask;
+    }
+
+    function _setClaimed(uint256 index) private {
+        uint256 claimedWordIndex = index / 256;
+        uint256 claimedBitIndex = index % 256;
+        _claimedBitMap[claimedWordIndex] =
+            _claimedBitMap[claimedWordIndex] |
+            (1 << claimedBitIndex);
     }
 
     receive() external payable {}

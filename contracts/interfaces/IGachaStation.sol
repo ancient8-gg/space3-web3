@@ -8,26 +8,30 @@ pragma solidity ^0.8.19;
 interface IGachaStation {
     /* ============= Events ============== */
     event OwnerOf(
-        address indexed user,
-        address tokenAddress,
+        uint256 id,
         uint256 tokenId,
-        uint256 amount
+        uint256 amount,
+        address tokenAddr,
+        address indexed user
     );
     event Claimed(
-        address indexed user,
-        address tokenAddress,
+        uint256 id,
         uint256 tokenId,
-        uint256 amount
+        uint256 amount,
+        address tokenAddr,
+        address indexed user
     );
 
     /* ============ Functions ============ */
     function setRewardOwner(
         address user,
-        address tokenAddress,
+        address tokenAddr,
         uint256 tokenId,
         uint256 amount,
-        string memory tokenType
-    ) external;
+        string calldata tokenType
+    ) external returns (uint256);
 
-    function claim(uint256 index) external;
+    function claim(uint256 idx) external;
+
+    function isClaimed(uint256 idx) external view returns (bool);
 }
