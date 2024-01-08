@@ -2,7 +2,6 @@ branches:
   - main
   - name: canary
     prerelease: rc
-  - 11-sc-refactor-web3-repository
 plugins:
   -
     - "@semantic-release/commit-analyzer"
