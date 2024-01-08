@@ -16,9 +16,12 @@ describe("GachaDeposit", function () {
     const [owner, otherAccount] = await ethers.getSigners();
 
     const GachaDeposit = await ethers.getContractFactory("GachaDeposit");
+    const Token = await ethers.getContractFactory("A8ERC20Test");
+    const token = await Token.deploy();
+    token.mint(otherAccount.address, parseEther("1000"));
     const gacha = await GachaDeposit.deploy();
 
-    return { gacha, owner, otherAccount };
+    return { gacha, owner, otherAccount, token };
   }
 
   describe("Deployment", function () {
@@ -26,50 +29,103 @@ describe("GachaDeposit", function () {
       const { gacha, owner } = await loadFixture(deployGachaDepositFixture);
     });
 
-    it("Should init the first game", async function () {
-      const { gacha } = await loadFixture(deployGachaDepositFixture);
-      const game = await gacha.initGame("1232321", "mongodb", 1);
+    it("Buy ticket with native token", async function () {
+      const { gacha, owner } = await loadFixture(deployGachaDepositFixture);
 
-      console.log("gacha.games: ", await gacha.games(0));
+      await gacha.buyTicket(
+        "ajalskakjlslkd",
+        parseEther("1"),
+        ethers.ZeroAddress,
+        {
+          value: parseEther("1"),
+        }
+      );
 
-      expect((await gacha.games(0)).fee).to.equal(1);
+      const ticket = await gacha.userTickets(owner.address, "ajalskakjlslkd");
+
+      expect(ticket[0]).to.equal("ajalskakjlslkd");
     });
 
-    it("Should reject the game initiation", async function () {
-      const { gacha, otherAccount } = await loadFixture(
+    it("Buy ticket with ERC20 token", async function () {
+      const { gacha, owner, token, otherAccount } = await loadFixture(
         deployGachaDepositFixture
       );
-      const game = console.log("gacha.games: ", await gacha.games(0));
+      const gachaAddress = await gacha.getAddress();
+      const amount = parseEther("10");
+      await token.connect(otherAccount).approve(gachaAddress, amount);
+      const tokenAddress = await token.getAddress();
+      await gacha
+        .connect(otherAccount)
+        .buyTicket("ajalskakjlslkd", amount, tokenAddress);
 
-      await gacha.connect(otherAccount).initGame("1232321", "mongodb", 1);
+      const tokenBalance = await token.balanceOf(otherAccount.address);
+      console.log("tokenBalance: ", tokenBalance);
+
+      expect(tokenBalance).to.equal(parseEther("1000") - parseEther("10"));
     });
 
-    it("Should receive and store the funds to lock", async function () {
+    it("Withdraw native token", async function () {
       const { gacha, owner } = await loadFixture(deployGachaDepositFixture);
 
-      const gameId = await gacha.initGame(
-        "1232321",
-        "mongodb",
-        parseEther("1")
+      await gacha.buyTicket(
+        "ajalskakjlslkd",
+        parseEther("1"),
+        ethers.ZeroAddress,
+        {
+          value: parseEther("1"),
+        }
       );
 
-      await gacha.buyTicket(0, { value: parseEther("1") });
+      const ticket = await gacha.userTickets(owner.address, "ajalskakjlslkd");
 
-      expect((await gacha.userTickets(owner.address, 0)).gameId).to.equal(0n);
+      await gacha.withdraw(ethers.ZeroAddress);
+
+      expect(ticket[0]).to.equal("ajalskakjlslkd");
     });
 
-    it("Should close game", async function () {
-      const { gacha, owner } = await loadFixture(deployGachaDepositFixture);
+    it("Withdraw ERC20 token", async function () {
+      const { gacha, owner, token, otherAccount } = await loadFixture(
+        deployGachaDepositFixture
+      );
+      const gachaAddress = await gacha.getAddress();
+      const amount = parseEther("10");
+      await token.connect(otherAccount).approve(gachaAddress, amount);
+      const tokenAddress = await token.getAddress();
+      await gacha
+        .connect(otherAccount)
+        .buyTicket("ajalskakjlslkd", amount, tokenAddress);
 
-      const gameId = await gacha.initGame(
-        "1232321",
-        "mongodb",
-        parseEther("1")
+      const gachaTokenBalance = await token.balanceOf(gachaAddress);
+      console.log("gachaTokenBalance erc: ", gachaTokenBalance);
+      await gacha.withdraw(tokenAddress);
+      const gachaTokenBalanceAfter = await token.balanceOf(gachaAddress);
+      console.log("gachaTokenBalanceAfter: ", gachaTokenBalanceAfter);
+
+      // expect(tokenBalance).to.equal(parseEther("1000") - parseEther("10"));
+    });
+
+    it("Use ticket", async function () {
+      const { gacha, owner, token, otherAccount } = await loadFixture(
+        deployGachaDepositFixture
+      );
+      console.log("ownerss: ", owner.address);
+      console.log("otherAddss: ", otherAccount.address);
+      const gachaAddress = await gacha.getAddress();
+      const amount = parseEther("10");
+      await token.connect(otherAccount).approve(gachaAddress, amount);
+      const tokenAddress = await token.getAddress();
+      await gacha
+        .connect(otherAccount)
+        .buyTicket("ajalskakjlslkd", amount, tokenAddress);
+
+      await gacha.connect(otherAccount).useTicket("ajalskakjlslkd");
+
+      const ticket = await gacha.userTickets(
+        otherAccount.address,
+        "ajalskakjlslkd"
       );
 
-      await gacha.closeGame(0);
-
-      expect((await gacha.games(0)).isEnded).to.equal(true);
+      expect(ticket[3]).to.equal(true);
     });
   });
 });

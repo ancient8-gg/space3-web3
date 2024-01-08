@@ -1,81 +1,71 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.19;
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
 
-contract GachaDeposit is AccessControl {
-    struct Game {
-        uint id;
-        uint fee;
-        string dataHash;
-        string provider;
-        bool isEnded;
-    }
+contract GachaDeposit is Ownable {
     struct Ticket {
-        uint gameId;
+        string gameId;
+        uint amount;
+        address tokenAddress;
         bool isUsed;
     }
 
-    Game[] public games;
-    mapping(address => Ticket[]) public userTickets;
+    mapping(address => mapping(string => Ticket)) public userTickets;
 
-    uint private _gameIdCounter = 0;
+    event BuyTicket(
+        address indexed user,
+        string indexed gameId,
+        uint amount,
+        address tokenAddress
+    );
 
-    event InitGame(uint id, string dataHash, string provider);
-    event BuyTicket(address indexed user, uint gameId);
-    event CloseGame(uint gameId);
+    event UseTicket(address indexed user, string indexed gameId);
 
-    // bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-
-    constructor() payable {
-        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-    }
-
-    function initGame(
-        string calldata _dataHash,
-        string calldata _provider,
-        uint fee
-    ) external onlyRole(DEFAULT_ADMIN_ROLE) returns (uint id) {
-        uint currentCounter = _gameIdCounter++;
-        games.push(Game(currentCounter, fee, _dataHash, _provider, false));
-        emit InitGame(currentCounter, _dataHash, _provider);
-        _gameIdCounter++;
-        return currentCounter;
-    }
-
-    function buyTicket(uint _gameId) external payable returns (bool status) {
-        Game memory game = getGame(_gameId);
-        require(game.isEnded == false, "Game is not valid!");
-        require(game.fee == msg.value, "Fee is not fit!");
-
-        userTickets[msg.sender].push(Ticket(_gameId, false));
-        emit BuyTicket(msg.sender, _gameId);
-
-        return true;
-    }
-
-    function getGame(uint _gameId) internal view returns (Game memory game) {
-        for (uint i = 0; i < games.length; i++) {
-            if (games[i].id == _gameId) {
-                game = games[i];
-                break;
-            }
+    function withdraw(address _tokenAddress) external onlyOwner {
+        if (_tokenAddress == address(0)) {
+            address payable _owner = payable(owner());
+            _owner.transfer(address(this).balance);
+        } else {
+            ERC20 token = ERC20(_tokenAddress);
+            uint balance = token.balanceOf(address(this));
+            token.transfer(owner(), balance);
         }
-        return game;
     }
 
-    function closeGame(uint _gameId) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        Game memory game = getGame(_gameId);
-        require(game.isEnded == false, "Game is ended!");
-        for (uint i = 0; i < games.length; i++) {
-            if (games[i].id == _gameId) {
-                games[i].isEnded = true;
-                emit CloseGame(_gameId);
-                break;
-            }
+    function buyTicket(
+        string memory _gameId,
+        uint _amount,
+        address _tokenAddress
+    ) external payable {
+        if (_tokenAddress == address(0)) {
+            require(msg.value == _amount, "Fee is not fit!");
+        } else {
+            ERC20 token = ERC20(_tokenAddress);
+            token.transferFrom(msg.sender, address(this), _amount);
         }
+        userTickets[msg.sender][_gameId] = Ticket(
+            _gameId,
+            _amount,
+            _tokenAddress,
+            false
+        );
+        emit BuyTicket(msg.sender, _gameId, _amount, _tokenAddress);
+    }
+
+    function useTicket(string memory _gameId) external payable {
+        string memory gameId = userTickets[msg.sender][_gameId].gameId;
+        require(
+            keccak256(abi.encodePacked(gameId)) !=
+                keccak256(abi.encodePacked("")) &&
+                userTickets[msg.sender][_gameId].isUsed == false,
+            "Ticket is not valid"
+        );
+        userTickets[msg.sender][_gameId].isUsed = true;
+        emit UseTicket(msg.sender, _gameId);
     }
 }
