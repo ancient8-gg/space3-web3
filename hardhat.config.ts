@@ -51,7 +51,7 @@ const config: HardhatUserConfig = {
         network: 'ancient8Testnet',
         chainId: 2863311531,
         urls: {
-          apiURL: 'https://testnet.a8scan.io/api',
+          apiURL: 'https://testnet.a8scan.io/api/v2',
           browserURL: 'https://testnet.a8scan.io',
         },
       },
@@ -59,7 +59,7 @@ const config: HardhatUserConfig = {
         network: 'ancient8TestnetV2',
         chainId: 28122024,
         urls: {
-          apiURL: 'https://scanv2-testnet.ancient8.gg/api',
+          apiURL: 'https://scanv2-testnet.ancient8.gg/api/v2',
           browserURL: 'https://scanv2-testnet.ancient8.gg',
         },
       },
