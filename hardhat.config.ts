@@ -1,7 +1,5 @@
 import { HardhatUserConfig } from 'hardhat/config';
 import '@nomicfoundation/hardhat-toolbox';
-import '@nomiclabs/hardhat-etherscan';
-import '@nomiclabs/hardhat-ethers';
 import 'hardhat-deploy';
 import * as Dotenv from 'dotenv';
 Dotenv.config();
@@ -11,7 +9,7 @@ const ACCOUNTS = [ADMIN_PK];
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: '0.8.19',
+    version: '0.8.20',
     settings: {
       optimizer: {
         enabled: true,
