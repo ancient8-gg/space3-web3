@@ -18,6 +18,10 @@ const config: HardhatUserConfig = {
     },
   },
   networks: {
+    hardhat: {
+      saveDeployments: false,
+      allowUnlimitedContractSize: false,
+    },
     ancient8Testnet: {
       url: 'https://rpc-testnet.ancient8.gg',
       chainId: 2863311531,

@@ -9,14 +9,23 @@ contract Space3Genesis is ERC721Enumerable {
     uint256 public immutable startTime;
     uint256 public immutable endTime;
 
+    modifier validPeriod(uint256 startTime_, uint256 endTime_) {
+        require(startTime_ < endTime_, "Invalid public mint period");
+        _;
+    }
+
     constructor(
         string memory uri,
         uint256 startTime_,
         uint256 endTime_
-    ) ERC721("Space3Genesis", "S11S") {
+    ) validPeriod(startTime_, endTime_) ERC721("Space3Genesis", "S11S") {
         _uri = uri;
         startTime = startTime_;
         endTime = endTime_;
+    }
+
+    function nextTokenId() public view returns (uint256) {
+        return _nextTokenId;
     }
 
     modifier onlyInPublicMint() {
