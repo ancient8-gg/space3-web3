@@ -19,11 +19,7 @@ describe("GachaDeposit", function () {
     const Token = await ethers.getContractFactory("TestERC20");
     const token = await Token.deploy(owner.address);
     token.mint(otherAccount.address, parseEther("1000"));
-    const gacha = await GachaDeposit.deploy(
-      owner.address,
-      parseEther("0.001"),
-      otherAccount
-    );
+    const gacha = await GachaDeposit.deploy(parseEther("0.001"));
 
     return { gacha, owner, otherAccount, token };
   }

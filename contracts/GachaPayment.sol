@@ -9,7 +9,6 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract GachaPayment is Ownable {
     uint private fee;
-    address private adminAddress;
 
     event BuyTicket(
         address indexed user,
@@ -18,13 +17,8 @@ contract GachaPayment is Ownable {
         address tokenAddress
     );
 
-    constructor(
-        address _initialOwner,
-        uint _fee,
-        address _adminAddress
-    ) Ownable(_initialOwner) {
+    constructor(uint _fee) Ownable(msg.sender) {
         fee = _fee;
-        _adminAddress = _adminAddress;
     }
 
     function setFee(uint _fee) external onlyOwner {
@@ -33,14 +27,6 @@ contract GachaPayment is Ownable {
 
     function getFee() external view onlyOwner returns (uint) {
         return fee;
-    }
-
-    function setAdmin(address _adminAddress) external onlyOwner {
-        adminAddress = _adminAddress;
-    }
-
-    function getAdmin() external view onlyOwner returns (address) {
-        return adminAddress;
     }
 
     function withdraw(address _tokenAddress) external onlyOwner {
@@ -66,7 +52,6 @@ contract GachaPayment is Ownable {
             ERC20 token = ERC20(_tokenAddress);
             token.transferFrom(msg.sender, address(this), _amount);
         }
-        payable(adminAddress).transfer(fee);
         emit BuyTicket(msg.sender, _orderId, _amount, _tokenAddress);
     }
 }
