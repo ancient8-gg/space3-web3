@@ -32,9 +32,6 @@ const config: HardhatUserConfig = {
       saveDeployments: true,
       allowUnlimitedContractSize: false,
     },
-    hardhat: {
-      saveDeployments: true,
-    },
   },
   namedAccounts: {
     deployer: {

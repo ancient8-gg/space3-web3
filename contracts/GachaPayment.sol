@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 // import "hardhat/console.sol";
 
 contract GachaPayment is Ownable {
-    uint private fee;
+    uint public fee;
 
     event BuyTicket(
         address indexed user,
@@ -23,10 +23,6 @@ contract GachaPayment is Ownable {
 
     function setFee(uint _fee) external onlyOwner {
         fee = _fee;
-    }
-
-    function getFee() external view onlyOwner returns (uint) {
-        return fee;
     }
 
     function withdraw(address _tokenAddress) external onlyOwner {
