@@ -9,11 +9,6 @@ contract Space3Genesis is ERC721Enumerable {
     uint256 public immutable startTime;
     uint256 public immutable endTime;
 
-    modifier validPeriod(uint256 startTime_, uint256 endTime_) {
-        require(startTime_ < endTime_, "Invalid public mint period");
-        _;
-    }
-
     constructor(
         string memory uri,
         uint256 startTime_,
@@ -24,8 +19,9 @@ contract Space3Genesis is ERC721Enumerable {
         endTime = endTime_;
     }
 
-    function nextTokenId() public view returns (uint256) {
-        return _nextTokenId;
+    modifier validPeriod(uint256 startTime_, uint256 endTime_) {
+        require(startTime_ < endTime_, "Invalid public mint period");
+        _;
     }
 
     modifier onlyInPublicMint() {
@@ -34,6 +30,10 @@ contract Space3Genesis is ERC721Enumerable {
             "Not in public mint period"
         );
         _;
+    }
+
+    function nextTokenId() public view returns (uint256) {
+        return _nextTokenId;
     }
 
     function safeMint(address to) public onlyInPublicMint {
