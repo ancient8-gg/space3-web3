@@ -1,37 +1,35 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
 /**
  * @dev Interface of the GachaStation
  */
 interface IGachaStation {
+    /* ============= Structs ============= */
+    struct Reward {
+        uint256 tokenId;
+        uint256 amount;
+        address tokenAddr;
+        string tokenType; // "ERC20", "ERC721", "ERC1155"
+    }
+
+    /* ============== Error ============== */
+    error DupplicatedClaim(uint256 id);
+
     /* ============= Events ============== */
-    event OwnerOf(
-        uint256 id,
-        uint256 tokenId,
-        uint256 amount,
-        address tokenAddr,
-        address indexed user
-    );
-    event Claimed(
-        uint256 id,
-        uint256 tokenId,
-        uint256 amount,
-        address tokenAddr,
-        address indexed user
-    );
+    event OwnerOf(uint256 id, address indexed owner, Reward indexed reward);
+    event Claimed(uint256 id, address indexed owner, Reward indexed reward);
 
     /* ============ Functions ============ */
     function setRewardOwner(
-        address user,
-        address tokenAddr,
-        uint256 tokenId,
-        uint256 amount,
-        string calldata tokenType
+        address owner,
+        Reward memory reward
     ) external returns (uint256);
 
-    function claim(uint256 idx) external;
+    function getRewardOwner(uint256 id) external view returns (address);
 
-    function isClaimed(uint256 idx) external view returns (bool);
+    function claim(uint256 id, address to) external;
+
+    function isClaimed(uint256 id) external view returns (bool);
 }
