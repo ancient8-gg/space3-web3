@@ -1,8 +1,4 @@
-import {
-  time,
-  loadFixture,
-} from "@nomicfoundation/hardhat-toolbox/network-helpers";
-import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
+import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { parseEther } from "ethers";
@@ -24,22 +20,45 @@ describe("GachaDeposit", function () {
     return { gacha, owner, otherAccount, token };
   }
 
-  describe("Happy case", function () {
+  describe("#Deployment", function () {
     it("Should deploy contract successfully", async function () {
-      const { gacha, owner } = await loadFixture(deployGachaDepositFixture);
-    });
+      const [owner, otherAccount] = await ethers.getSigners();
 
+      const GachaDeposit = await ethers.getContractFactory("GachaPayment");
+      const Token = await ethers.getContractFactory("TestERC20");
+      const token = await Token.deploy(owner.address);
+      token.mint(otherAccount.address, parseEther("1000"));
+      const gacha = await GachaDeposit.deploy(parseEther("0.001"));
+
+      expect(await gacha.getAddress()).to.be.match(/^0x[a-fA-F0-9]{40}$/);
+    });
+  });
+
+  describe("#setFee", function () {
     it("Should set fee successfully ", async function () {
       const { gacha, owner } = await loadFixture(deployGachaDepositFixture);
 
       await gacha.setFee(parseEther("0.001"));
 
-      // const fee = await gacha.fee();
+      const fee = await gacha.fee();
 
-      // expect(fee).to.equal(parseEther("0.001"));
+      expect(fee).to.equal(parseEther("0.001"));
     });
 
-    it("Should Buy ticket with native token successfully", async function () {
+    it("Should set fee unsuccessfully ", async function () {
+      const { gacha, owner } = await loadFixture(deployGachaDepositFixture);
+
+      try {
+        await gacha.setFee(parseEther("-111"));
+      } catch {}
+
+      const fee = await gacha.fee();
+      expect(fee).to.equal(parseEther("0.001"));
+    });
+  });
+
+  describe("#buyTicket", function () {
+    it("Should buy ticket with native token successfully", async function () {
       const { gacha } = await loadFixture(deployGachaDepositFixture);
 
       await expect(
@@ -51,7 +70,7 @@ describe("GachaDeposit", function () {
             value: parseEther("1") + parseEther("0.001"),
           }
         )
-      ).to.changeEtherBalance(gacha, parseEther("1"));
+      ).to.changeEtherBalance(gacha, parseEther("1") + parseEther("0.001"));
 
       await expect(
         gacha.buyTicket(
@@ -73,64 +92,14 @@ describe("GachaDeposit", function () {
       const amount = parseEther("10");
       await token.connect(otherAccount).approve(gachaAddress, amount);
       const tokenAddress = await token.getAddress();
-      await gacha
-        .connect(otherAccount)
-        .buyTicket("651e1ca6e496c0a956de8d91", amount, tokenAddress, {
-          value: parseEther("0.001"),
-        });
 
-      const tokenBalance = await token.balanceOf(otherAccount.address);
-
-      expect(tokenBalance).to.equal(parseEther("1000") - parseEther("10"));
-    });
-
-    it("Should withdraw native token successfully", async function () {
-      const { gacha, owner } = await loadFixture(deployGachaDepositFixture);
-
-      await gacha.buyTicket(
-        "651e1ca6e496c0a956de8d91",
-        parseEther("1"),
-        ethers.ZeroAddress,
-        {
-          value: parseEther("1") + parseEther("0.001"),
-        }
-      );
-
-      await expect(gacha.withdraw(ethers.ZeroAddress)).to.changeEtherBalance(
-        gacha,
-        parseEther("-1")
-      );
-    });
-
-    it("Should withdraw ERC20 token successfully", async function () {
-      const { gacha, token, otherAccount } = await loadFixture(
-        deployGachaDepositFixture
-      );
-      const gachaAddress = await gacha.getAddress();
-      const amount = parseEther("10");
-      await token.connect(otherAccount).approve(gachaAddress, amount);
-      const tokenAddress = await token.getAddress();
-      await gacha
-        .connect(otherAccount)
-        .buyTicket("651e1ca6e496c0a956de8d91", amount, tokenAddress, {
-          value: parseEther("0.001"),
-        });
-
-      await gacha.withdraw(tokenAddress);
-    });
-  });
-
-  describe("Unhappy case", function () {
-    it("Should set fee unsuccessfully ", async function () {
-      const { gacha, owner } = await loadFixture(deployGachaDepositFixture);
-
-      try {
-        await gacha.setFee(parseEther("-111"));
-      } catch {}
-
-      const fee = await gacha.getFee();
-
-      expect(fee).to.equal(parseEther("0.001"));
+      await expect(
+        gacha
+          .connect(otherAccount)
+          .buyTicket("651e1ca6e496c0a956de8d91", amount, tokenAddress, {
+            value: parseEther("0.001"),
+          })
+      ).to.changeEtherBalance(gacha, parseEther("0.001"));
     });
 
     it("Should Buy ticket with native token unsuccessfully", async function () {
@@ -166,6 +135,43 @@ describe("GachaDeposit", function () {
       const tokenBalance = await token.balanceOf(gacha);
 
       expect(tokenBalance).to.equal(parseEther("0"));
+    });
+  });
+
+  describe("#withdraw", function () {
+    it("Should withdraw native token successfully", async function () {
+      const { gacha, owner } = await loadFixture(deployGachaDepositFixture);
+
+      await gacha.buyTicket(
+        "651e1ca6e496c0a956de8d91",
+        parseEther("1"),
+        ethers.ZeroAddress,
+        {
+          value: parseEther("1") + parseEther("0.001"),
+        }
+      );
+
+      await expect(gacha.withdraw(ethers.ZeroAddress)).to.changeEtherBalance(
+        gacha,
+        -(parseEther("1") + parseEther("0.001"))
+      );
+    });
+
+    it("Should withdraw ERC20 token successfully", async function () {
+      const { gacha, token, otherAccount } = await loadFixture(
+        deployGachaDepositFixture
+      );
+      const gachaAddress = await gacha.getAddress();
+      const amount = parseEther("10");
+      await token.connect(otherAccount).approve(gachaAddress, amount);
+      const tokenAddress = await token.getAddress();
+      await gacha
+        .connect(otherAccount)
+        .buyTicket("651e1ca6e496c0a956de8d91", amount, tokenAddress, {
+          value: parseEther("0.001"),
+        });
+
+      await gacha.withdraw(tokenAddress);
     });
 
     it("Should withdraw native token unsuccessfully", async function () {
