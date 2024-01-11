@@ -15,6 +15,21 @@
   "main": "build/sdk/typescript/cjs/index.js",
   "module": "build/sdk/typescript/esm/index.js",
   "types": "build/sdk/typescript/types/index.d.ts",
+  "files": [
+    "build/sdk/typescript"
+  ],
+  "exports": {
+    ".": {
+      "default": "./build/sdk/typescript/cjs/index.js",
+      "import": "./build/sdk/typescript/esm/index.js",
+      "types": "./build/sdk/typescript/types/index.d.ts"
+    },
+    "./open-edition": {
+      "default": "./build/sdk/typescript/cjs/open-edition/index.js",
+      "import": "./build/sdk/typescript/esm/open-edition/index.js",
+      "types": "./build/sdk/typescript/types/open-edition/index.d.ts"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/ancient8-gg/space3-web3.git",
