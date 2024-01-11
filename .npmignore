@@ -1,0 +1,13 @@
+.github
+node_modules
+contracts
+deploy
+legacy-contracts
+scripts
+sdk
+test
+cache
+artifacts
+coverage
+coverage.json
+.env
