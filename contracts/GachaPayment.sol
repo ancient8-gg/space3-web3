@@ -2,7 +2,7 @@
 pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
@@ -30,7 +30,7 @@ contract GachaPayment is Ownable {
             address payable _owner = payable(owner());
             _owner.transfer(address(this).balance);
         } else {
-            ERC20 token = ERC20(_tokenAddress);
+            IERC20 token = IERC20(_tokenAddress);
             uint balance = token.balanceOf(address(this));
             token.transfer(owner(), balance);
         }
@@ -45,7 +45,7 @@ contract GachaPayment is Ownable {
             require(msg.value == _amount + fee, "Payment is not valid!");
         } else {
             require(msg.value == fee, "Payment is not valid!");
-            ERC20 token = ERC20(_tokenAddress);
+            IERC20 token = IERC20(_tokenAddress);
             token.transferFrom(msg.sender, address(this), _amount);
         }
         emit BuyTicket(msg.sender, _orderId, _amount, _tokenAddress);
