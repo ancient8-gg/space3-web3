@@ -28,6 +28,11 @@
       "default": "./build/sdk/typescript/cjs/open-edition/index.js",
       "import": "./build/sdk/typescript/esm/open-edition/index.js",
       "types": "./build/sdk/typescript/types/open-edition/index.d.ts"
+    },
+    "./gacha-payment": {
+      "default": "./build/sdk/typescript/cjs/gacha-payment/index.js",
+      "import": "./build/sdk/typescript/esm/gacha-payment/index.js",
+      "types": "./build/sdk/typescript/types/gacha-payment/index.d.ts"
     }
   },
   "repository": {

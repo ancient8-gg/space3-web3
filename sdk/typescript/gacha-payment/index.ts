@@ -1,7 +1,10 @@
 import { ContractRunner, ethers, parseEther, parseUnits } from "ethers";
 
-import { GachaPayment, GachaPayment__factory } from "../typechain";
-import { ERC20_ABI } from "./erc20.abi";
+import {
+  ERC20__factory,
+  GachaPayment,
+  GachaPayment__factory,
+} from "../typechain";
 
 export class Space3GenesisSDK {
   public readonly contract: GachaPayment;
@@ -25,11 +28,7 @@ export class Space3GenesisSDK {
 
     if (tokenAddress) {
       nativeValue = fee;
-      const erc20 = new ethers.Contract(
-        tokenAddress,
-        ERC20_ABI,
-        this.contract.runner
-      );
+      const erc20 = ERC20__factory.connect(tokenAddress, this.contract.runner);
       const decimals = (await erc20.decimals()) || 0;
       decimalizedAmount = parseUnits(`${amount}`, decimals);
     }
