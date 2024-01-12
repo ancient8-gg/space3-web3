@@ -1,7 +1,9 @@
 {
   "name": "@space3/web3",
   "version": "1.0.0-rc.1",
-  "description": "",
+  "description": "Contracts and SDKs for Space3",
+  "author": "Space3",
+  "license": "ISC",
   "scripts": {
     "compile": "hardhat compile",
     "prebuild": "rm -rf build",
@@ -37,13 +39,14 @@
       "types": "./build/sdk/typescript/types/gacha-payment/index.d.ts"
     }
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/ancient8-gg/space3-web3.git",
     "directory": "sdk/typescript"
   },
-  "author": "Space3",
-  "license": "ISC",
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.1",
     "dotenv": "^16.3.1"
