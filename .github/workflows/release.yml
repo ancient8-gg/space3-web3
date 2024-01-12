@@ -30,6 +30,12 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
+      - name: Compile & build
+        run: |
+          yarn prebuild
+          yarn compile
+          yarn sdk:ts:build
+
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
