@@ -1,5 +1,6 @@
 import { HardhatUserConfig } from 'hardhat/config'
 import '@nomicfoundation/hardhat-toolbox'
+import 'hardhat-gas-reporter'
 import 'hardhat-deploy'
 import * as Dotenv from 'dotenv'
 Dotenv.config()
@@ -41,6 +42,9 @@ const config: HardhatUserConfig = {
     deployer: {
       default: 0,
     },
+  },
+  gasReporter: {
+    enabled: process.env.REPORT_GAS ? true : false,
   },
   mocha: {},
   etherscan: {
