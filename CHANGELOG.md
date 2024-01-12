@@ -1,3 +1,10 @@
+# [1.0.0-rc.2](https://github.com/ancient8-gg/space3-web3/compare/v1.0.0-rc.1...v1.0.0-rc.2) (2024-01-12)
+
+
+### Bug Fixes
+
+* incorrect publish scope ([802fde4](https://github.com/ancient8-gg/space3-web3/commit/802fde4c2e8a7220084f57c2eeb9ed32b8ef7f82))
+
 # 1.0.0-rc.1 (2024-01-12)
 
 
