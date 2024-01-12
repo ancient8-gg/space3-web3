@@ -85,7 +85,7 @@ describe("GachaDeposit", function () {
     });
 
     it("Should buy ticket with ERC20 token successfully", async function () {
-      const { gacha, owner, token, otherAccount } = await loadFixture(
+      const { gacha, token, otherAccount } = await loadFixture(
         deployGachaDepositFixture
       );
       const gachaAddress = await gacha.getAddress();
