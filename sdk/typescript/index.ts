@@ -1,1 +1,1 @@
-export * from './open-edition';
+export * from './open-edition'
