@@ -1,3 +1,10 @@
+# [1.0.0-rc.3](https://github.com/ancient8-gg/space3-web3/compare/v1.0.0-rc.2...v1.0.0-rc.3) (2024-01-12)
+
+
+### Bug Fixes
+
+* missing build step ([a3068d0](https://github.com/ancient8-gg/space3-web3/commit/a3068d0f6736f6cffdb24a40d8ccae69ceb225f9))
+
 # [1.0.0-rc.2](https://github.com/ancient8-gg/space3-web3/compare/v1.0.0-rc.1...v1.0.0-rc.2) (2024-01-12)
 
 
