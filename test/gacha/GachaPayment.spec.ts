@@ -3,19 +3,19 @@ import { expect } from 'chai'
 import { ethers } from 'hardhat'
 import { parseEther } from 'ethers'
 
-describe('GachaDeposit', function () {
+describe('GachaPayment', function () {
   // We define a fixture to reuse the same setup in every test.
   // We use loadFixture to run this setup once, snapshot that state,
   // and reset Hardhat Network to that snapshot in every test.
-  async function deployGachaDepositFixture() {
+  async function deployGachaPaymentFixture() {
     // Contracts are deployed using the first signer/account by default
     const [owner, otherAccount] = await ethers.getSigners()
 
-    const GachaDeposit = await ethers.getContractFactory('GachaPayment')
+    const GachaPayment = await ethers.getContractFactory('GachaPayment')
     const Token = await ethers.getContractFactory('TestERC20')
     const token = await Token.deploy(owner.address)
     token.mint(otherAccount.address, parseEther('1000'))
-    const gacha = await GachaDeposit.deploy(parseEther('0.001'))
+    const gacha = await GachaPayment.deploy(parseEther('0.001'))
 
     return { gacha, owner, otherAccount, token }
   }
@@ -24,11 +24,11 @@ describe('GachaDeposit', function () {
     it('Should deploy contract successfully', async function () {
       const [owner, otherAccount] = await ethers.getSigners()
 
-      const GachaDeposit = await ethers.getContractFactory('GachaPayment')
+      const GachaPayment = await ethers.getContractFactory('GachaPayment')
       const Token = await ethers.getContractFactory('TestERC20')
       const token = await Token.deploy(owner.address)
       token.mint(otherAccount.address, parseEther('1000'))
-      const gacha = await GachaDeposit.deploy(parseEther('0.001'))
+      const gacha = await GachaPayment.deploy(parseEther('0.001'))
 
       expect(await gacha.getAddress()).to.be.match(/^0x[a-fA-F0-9]{40}$/)
     })
@@ -36,7 +36,7 @@ describe('GachaDeposit', function () {
 
   describe('#setFee', function () {
     it('Should set fee successfully ', async function () {
-      const { gacha } = await loadFixture(deployGachaDepositFixture)
+      const { gacha } = await loadFixture(deployGachaPaymentFixture)
 
       await gacha.setFee(parseEther('0.001'))
 
@@ -46,7 +46,7 @@ describe('GachaDeposit', function () {
     })
 
     it('Should set fee unsuccessfully ', async function () {
-      const { gacha } = await loadFixture(deployGachaDepositFixture)
+      const { gacha } = await loadFixture(deployGachaPaymentFixture)
 
       try {
         await gacha.setFee(parseEther('-111'))
@@ -59,7 +59,7 @@ describe('GachaDeposit', function () {
 
   describe('#buyTicket', function () {
     it('Should buy ticket with native token successfully', async function () {
-      const { gacha } = await loadFixture(deployGachaDepositFixture)
+      const { gacha } = await loadFixture(deployGachaPaymentFixture)
 
       await expect(
         gacha.buyTicket(
@@ -86,7 +86,7 @@ describe('GachaDeposit', function () {
 
     it('Should buy ticket with ERC20 token successfully', async function () {
       const { gacha, token, otherAccount } = await loadFixture(
-        deployGachaDepositFixture,
+        deployGachaPaymentFixture,
       )
       const gachaAddress = await gacha.getAddress()
       const amount = parseEther('10')
@@ -103,7 +103,7 @@ describe('GachaDeposit', function () {
     })
 
     it('Should Buy ticket with native token unsuccessfully', async function () {
-      const { gacha } = await loadFixture(deployGachaDepositFixture)
+      const { gacha } = await loadFixture(deployGachaPaymentFixture)
 
       await expect(
         gacha.buyTicket(
@@ -119,7 +119,7 @@ describe('GachaDeposit', function () {
 
     it('Should buy ticket with ERC20 token unsuccessfully', async function () {
       const { gacha, token, otherAccount } = await loadFixture(
-        deployGachaDepositFixture,
+        deployGachaPaymentFixture,
       )
       const gachaAddress = await gacha.getAddress()
       const amount = parseEther('-10')
@@ -140,7 +140,7 @@ describe('GachaDeposit', function () {
 
   describe('#withdraw', function () {
     it('Should withdraw native token successfully', async function () {
-      const { gacha } = await loadFixture(deployGachaDepositFixture)
+      const { gacha } = await loadFixture(deployGachaPaymentFixture)
 
       await gacha.buyTicket(
         '651e1ca6e496c0a956de8d91',
@@ -159,7 +159,7 @@ describe('GachaDeposit', function () {
 
     it('Should withdraw ERC20 token successfully', async function () {
       const { gacha, token, otherAccount } = await loadFixture(
-        deployGachaDepositFixture,
+        deployGachaPaymentFixture,
       )
       const gachaAddress = await gacha.getAddress()
       const amount = parseEther('10')
@@ -176,7 +176,7 @@ describe('GachaDeposit', function () {
 
     it('Should withdraw native token unsuccessfully', async function () {
       const { gacha, otherAccount } = await loadFixture(
-        deployGachaDepositFixture,
+        deployGachaPaymentFixture,
       )
 
       await gacha.buyTicket(
@@ -193,7 +193,7 @@ describe('GachaDeposit', function () {
 
     it('Should withdraw ERC20 token unsuccessfully', async function () {
       const { gacha, token, otherAccount } = await loadFixture(
-        deployGachaDepositFixture,
+        deployGachaPaymentFixture,
       )
       const gachaAddress = await gacha.getAddress()
       const amount = parseEther('10')
