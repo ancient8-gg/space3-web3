@@ -5,6 +5,7 @@ import { DateTime } from 'luxon'
 const func: DeployFunction = async function ({
   getNamedAccounts,
   deployments,
+  run,
 }: HardhatRuntimeEnvironment) {
   const { deployer } = await getNamedAccounts()
   const { deploy } = deployments
@@ -16,9 +17,13 @@ const func: DeployFunction = async function ({
     process.env.SPACE3_GENESIS_END_DATE || '',
   ).toUnixInteger()
 
-  await deploy('Space3Genesis', {
+  const { address } = await deploy('Space3Genesis', {
     from: deployer,
     args: [tokenUri, startTime, endTime],
+  })
+  await run('verify:verify', {
+    address,
+    constructorArguments: [tokenUri, startTime, endTime],
   })
 }
 func.id = 'space3_genesis'

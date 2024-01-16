@@ -24,19 +24,19 @@
   ],
   "exports": {
     ".": {
-      "default": "./build/sdk/typescript/cjs/index.js",
       "import": "./build/sdk/typescript/esm/index.js",
-      "types": "./build/sdk/typescript/types/index.d.ts"
+      "types": "./build/sdk/typescript/types/index.d.ts",
+      "default": "./build/sdk/typescript/cjs/index.js"
     },
     "./open-edition": {
-      "default": "./build/sdk/typescript/cjs/open-edition/index.js",
       "import": "./build/sdk/typescript/esm/open-edition/index.js",
-      "types": "./build/sdk/typescript/types/open-edition/index.d.ts"
+      "types": "./build/sdk/typescript/types/open-edition/index.d.ts",
+      "default": "./build/sdk/typescript/cjs/open-edition/index.js"
     },
-    "./gacha-payment": {
-      "default": "./build/sdk/typescript/cjs/gacha-payment/index.js",
-      "import": "./build/sdk/typescript/esm/gacha-payment/index.js",
-      "types": "./build/sdk/typescript/types/gacha-payment/index.d.ts"
+    "./gacha": {
+      "import": "./build/sdk/typescript/esm/gacha/index.js",
+      "types": "./build/sdk/typescript/types/gacha/index.d.ts",
+      "default": "./build/sdk/typescript/cjs/gacha/index.js"
     }
   },
   "publishConfig": {
