@@ -1,3 +1,15 @@
+# [1.0.0-rc.4](https://github.com/ancient8-gg/space3-web3/compare/v1.0.0-rc.3...v1.0.0-rc.4) (2024-01-16)
+
+
+### Bug Fixes
+
+* imports issue ([a727149](https://github.com/ancient8-gg/space3-web3/commit/a727149fdcab5a920c94a8a14368206ef7791025))
+
+
+### Features
+
+* remove ERC721 Enumerable ([e4e089b](https://github.com/ancient8-gg/space3-web3/commit/e4e089b3eda91da17f62b9f39f4c0f293a4ec8e9))
+
 # [1.0.0-rc.3](https://github.com/ancient8-gg/space3-web3/compare/v1.0.0-rc.2...v1.0.0-rc.3) (2024-01-12)
 
 
