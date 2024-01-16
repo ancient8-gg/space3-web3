@@ -6,7 +6,7 @@ import {
   GachaPayment__factory,
 } from '../typechain'
 
-export class Space3GenesisSDK {
+export class GachaPaymentSDK {
   public readonly contract: GachaPayment
 
   constructor(contractAddress: string, runner: ContractRunner) {
