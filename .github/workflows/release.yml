@@ -2,7 +2,7 @@ name: Release
 on:
   push:
     branches:
-      - master
+      - main
       - canary
 
 permissions:
@@ -29,6 +29,14 @@ jobs:
 
       - name: Install dependencies
         run: yarn install
+
+      - name: Compile & build
+        env:
+          ADMIN_PK: ${{ vars.COMPILER_PK }}
+        run: |
+          yarn prebuild
+          yarn compile
+          yarn sdk:ts:build
 
       - name: Release
         env:

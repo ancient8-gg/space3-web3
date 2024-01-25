@@ -1,10 +1,16 @@
 {
   "name": "@space3/web3",
   "version": "0.0.0",
-  "description": "",
+  "description": "Contracts and SDKs for Space3",
+  "author": "Space3",
+  "license": "ISC",
   "scripts": {
     "compile": "hardhat compile",
     "prebuild": "rm -rf build",
+    "test": "hardhat test",
+    "deploy": "hardhat deploy",
+    "verify": "hardhat verify",
+    "lint": "eslint \"**/*.ts\" --fix",
     "sdk:ts:build:cjs": "tsc -p tsconfig.sdk.cjs.json",
     "sdk:ts:build:esm": "tsc -p tsconfig.sdk.esm.json",
     "sdk:ts:build:types": "tsc -p tsconfig.sdk.types.json",
@@ -13,13 +19,34 @@
   "main": "build/sdk/typescript/cjs/index.js",
   "module": "build/sdk/typescript/esm/index.js",
   "types": "build/sdk/typescript/types/index.d.ts",
+  "files": [
+    "build/sdk/typescript"
+  ],
+  "exports": {
+    ".": {
+      "import": "./build/sdk/typescript/esm/index.js",
+      "types": "./build/sdk/typescript/types/index.d.ts",
+      "default": "./build/sdk/typescript/cjs/index.js"
+    },
+    "./open-edition": {
+      "import": "./build/sdk/typescript/esm/open-edition/index.js",
+      "types": "./build/sdk/typescript/types/open-edition/index.d.ts",
+      "default": "./build/sdk/typescript/cjs/open-edition/index.js"
+    },
+    "./gacha": {
+      "import": "./build/sdk/typescript/esm/gacha/index.js",
+      "types": "./build/sdk/typescript/types/gacha/index.d.ts",
+      "default": "./build/sdk/typescript/cjs/gacha/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/ancient8-gg/space3-web3.git",
     "directory": "sdk/typescript"
   },
-  "author": "Space3",
-  "license": "ISC",
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.1",
     "dotenv": "^16.3.1"
@@ -35,14 +62,22 @@
     "@typechain/ethers-v6": "^0.5.1",
     "@typechain/hardhat": "^9.1.0",
     "@types/chai": "^4.3.11",
+    "@types/luxon": "^3.4.0",
     "@types/mocha": ">=10.0.6",
     "@types/node": ">=20.10.7",
+    "@typescript-eslint/eslint-plugin": "^6.18.1",
+    "@typescript-eslint/parser": "^6.18.1",
     "chai": "^4.2.0",
     "conventional-changelog-conventionalcommits": "^7.0.2",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
     "ethers": "^6.9.2",
     "hardhat": "^2.19.4",
     "hardhat-deploy": "^0.11.45",
     "hardhat-gas-reporter": "^1.0.8",
+    "luxon": "^3.4.4",
+    "prettier": "^3.1.1",
     "semantic-release": "^22.0.12",
     "solidity-coverage": "^0.8.1",
     "ts-node": ">=10.9.2",

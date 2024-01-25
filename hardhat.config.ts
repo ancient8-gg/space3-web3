@@ -1,11 +1,12 @@
-import { HardhatUserConfig } from 'hardhat/config';
-import '@nomicfoundation/hardhat-toolbox';
-import 'hardhat-deploy';
-import * as Dotenv from 'dotenv';
-Dotenv.config();
+import { HardhatUserConfig } from 'hardhat/config'
+import '@nomicfoundation/hardhat-toolbox'
+import 'hardhat-gas-reporter'
+import 'hardhat-deploy'
+import * as Dotenv from 'dotenv'
+Dotenv.config()
 
-const ADMIN_PK = process.env.ADMIN_PK || '';
-const ACCOUNTS = [ADMIN_PK];
+const ADMIN_PK = process.env.ADMIN_PK || ''
+const ACCOUNTS = [ADMIN_PK]
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -18,6 +19,10 @@ const config: HardhatUserConfig = {
     },
   },
   networks: {
+    hardhat: {
+      saveDeployments: false,
+      allowUnlimitedContractSize: false,
+    },
     ancient8Testnet: {
       url: 'https://rpc-testnet.ancient8.gg',
       chainId: 2863311531,
@@ -38,6 +43,9 @@ const config: HardhatUserConfig = {
       default: 0,
     },
   },
+  gasReporter: {
+    enabled: process.env.REPORT_GAS ? true : false,
+  },
   mocha: {},
   etherscan: {
     apiKey: {
@@ -49,7 +57,7 @@ const config: HardhatUserConfig = {
         network: 'ancient8Testnet',
         chainId: 2863311531,
         urls: {
-          apiURL: 'https://testnet.a8scan.io/api/v2',
+          apiURL: 'https://testnet.a8scan.io/api',
           browserURL: 'https://testnet.a8scan.io',
         },
       },
@@ -57,7 +65,7 @@ const config: HardhatUserConfig = {
         network: 'ancient8TestnetV2',
         chainId: 28122024,
         urls: {
-          apiURL: 'https://scanv2-testnet.ancient8.gg/api/v2',
+          apiURL: 'https://scanv2-testnet.ancient8.gg/api',
           browserURL: 'https://scanv2-testnet.ancient8.gg',
         },
       },
@@ -66,6 +74,6 @@ const config: HardhatUserConfig = {
   typechain: {
     outDir: './sdk/typescript/typechain',
   },
-};
+}
 
-export default config;
+export default config
