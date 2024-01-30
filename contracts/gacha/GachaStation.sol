@@ -150,7 +150,7 @@ contract GachaStation is
    * @param reward The reward details.
    */
   function _distribute(address recipient, Reward memory reward) internal {
-    if (reward.tokenAddr == address(0)) {
+    if (reward.tokenType == 0x0) {
       _transferEther(recipient, reward.amount);
     } else if (reward.tokenType == keccak256('ERC20')) {
       _transferERC20(reward.tokenAddr, recipient, reward.amount);
