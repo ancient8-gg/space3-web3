@@ -2,10 +2,13 @@
 
 pragma solidity ^0.8.20;
 
+import {IERC721Receiver} from '@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
+import {IERC1155Receiver} from '@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol';
+
 /**
  * @dev Interface of the GachaStation
  */
-interface IGachaStation {
+interface IGachaStation is IERC721Receiver, IERC1155Receiver {
   /* ============== Error ============== */
   error AlreadyClaimed(uint256 id);
   error UnsupportedTokenType();
