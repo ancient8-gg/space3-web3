@@ -22,6 +22,6 @@ const func: DeployFunction = async function ({
 }
 
 func.id = 'gacha_station'
-func.tags = ['GachaStation', 'gacha_station']
+func.tags = ['GachaStation', 'gacha']
 
 export default func
