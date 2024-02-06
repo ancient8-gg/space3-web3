@@ -1,3 +1,19 @@
+# [1.0.0-rc.5](https://github.com/ancient8-gg/space3-web3/compare/v1.0.0-rc.4...v1.0.0-rc.5) (2024-02-06)
+
+
+### Bug Fixes
+
+* add test & adjust contract ([2ae0157](https://github.com/ancient8-gg/space3-web3/commit/2ae0157a9da4e9223c0c99811c1df6408d2df5c8))
+
+
+### Features
+
+* add deploy script for gacha station contract ([872517a](https://github.com/ancient8-gg/space3-web3/commit/872517ac7ec908c2e2f8bb4c62be92966a40083a))
+* add sdk for gacha station ([6b1a480](https://github.com/ancient8-gg/space3-web3/commit/6b1a48065cccaa40856adde77d9bc7c960579a26))
+* add send native token as reward ([3db2704](https://github.com/ancient8-gg/space3-web3/commit/3db27049e3cfa1a786f858574aa7ac0f673363ea))
+* contract deposit & add test cases ([de0410b](https://github.com/ancient8-gg/space3-web3/commit/de0410bcd00fe38b4e1c6bc73430806160fd35aa))
+* init gc station contract ([305f211](https://github.com/ancient8-gg/space3-web3/commit/305f2114a239ba1fa8f8a940590637cdc2076369))
+
 # [1.0.0-rc.4](https://github.com/ancient8-gg/space3-web3/compare/v1.0.0-rc.3...v1.0.0-rc.4) (2024-01-16)
 
 
