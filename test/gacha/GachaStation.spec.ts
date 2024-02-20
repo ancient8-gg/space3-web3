@@ -157,7 +157,7 @@ describe('GachaStation', function () {
         tokenId: 0,
         tokenAddr,
         amount: 100,
-        tokenType: keccak256(toUtf8Bytes('ERC20')),
+        tokenType: keccak256(toUtf8Bytes('ERC-20')),
       }
 
       await expect(
@@ -178,7 +178,7 @@ describe('GachaStation', function () {
         tokenId: 0,
         tokenAddr,
         amount: 100,
-        tokenType: keccak256(toUtf8Bytes('ERC20')),
+        tokenType: keccak256(toUtf8Bytes('ERC-20')),
       }
       await expect(await station.setRewardOwner(wallet0.address, reward))
         .to.emit(station, 'OwnershipGranted')
@@ -195,7 +195,7 @@ describe('GachaStation', function () {
         tokenId: 0,
         tokenAddr,
         amount: 1,
-        tokenType: keccak256(toUtf8Bytes('ERC721')),
+        tokenType: keccak256(toUtf8Bytes('ERC-721')),
       }
 
       await expect(await station.setRewardOwner(wallet0.address, reward))
@@ -213,7 +213,7 @@ describe('GachaStation', function () {
         tokenId: 0,
         tokenAddr,
         amount: 1,
-        tokenType: keccak256(toUtf8Bytes('ERC1155')),
+        tokenType: keccak256(toUtf8Bytes('ERC-1155')),
       }
 
       await expect(await station.setRewardOwner(wallet0.address, reward))
@@ -234,7 +234,7 @@ describe('GachaStation', function () {
         tokenId: 0,
         tokenAddr,
         amount: 1,
-        tokenType: keccak256(toUtf8Bytes('ERC20')),
+        tokenType: keccak256(toUtf8Bytes('ERC-20')),
       }
       // Deposit resources
       const amount = parseEther('1')
@@ -262,7 +262,7 @@ describe('GachaStation', function () {
         tokenId: 0,
         tokenAddr,
         amount: 1,
-        tokenType: keccak256(toUtf8Bytes('ERC721')),
+        tokenType: keccak256(toUtf8Bytes('ERC-721')),
       }
       // Deposit resources to the contract
       await erc721Token.connect(owner).approve(station, 0)
@@ -289,7 +289,7 @@ describe('GachaStation', function () {
         tokenId: 1,
         tokenAddr,
         amount: 1,
-        tokenType: keccak256(toUtf8Bytes('ERC1155')),
+        tokenType: keccak256(toUtf8Bytes('ERC-1155')),
       }
       // Deposit resources to the contract
       await erc1155Token.connect(owner).setApprovalForAll(station, true)
@@ -316,7 +316,7 @@ describe('GachaStation', function () {
         tokenId: 0,
         tokenAddr,
         amount: 1,
-        tokenType: keccak256(toUtf8Bytes('ERC20')),
+        tokenType: keccak256(toUtf8Bytes('ERC-20')),
       }
 
       // Deposit resources
