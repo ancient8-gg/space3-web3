@@ -5,11 +5,11 @@ import {
   GachaStation__factory,
 } from '../typechain'
 
-enum TokenType {
-  NATIVE,
-  ERC20,
-  ERC721,
-  ERC1155,
+export enum TokenType {
+  NATIVE = 'NATIVE',
+  ERC20 = 'ERC20',
+  ERC721 = 'ERC721',
+  ERC1155 = 'ERC1155',
 }
 
 export class GachaStationSDK {
