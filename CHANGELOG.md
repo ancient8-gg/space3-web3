@@ -1,3 +1,11 @@
+# [1.0.0-rc.6](https://github.com/ancient8-gg/space3-web3/compare/v1.0.0-rc.5...v1.0.0-rc.6) (2024-02-21)
+
+
+### Bug Fixes
+
+* correct token standard ([c4c4388](https://github.com/ancient8-gg/space3-web3/commit/c4c43884dee89fea10f2f82fa9affbf08cef5f5f))
+* correct token type enum ([6496355](https://github.com/ancient8-gg/space3-web3/commit/64963553392837dc33550b90692ef8b92bd04100))
+
 # [1.0.0-rc.5](https://github.com/ancient8-gg/space3-web3/compare/v1.0.0-rc.4...v1.0.0-rc.5) (2024-02-06)
 
 
