@@ -5,11 +5,11 @@ import {
   GachaStation__factory,
 } from '../typechain'
 
-enum TokenType {
-  NATIVE,
-  ERC20,
-  ERC721,
-  ERC1155,
+export enum TokenType {
+  NATIVE = 'NATIVE',
+  ERC20 = 'ERC-20',
+  ERC721 = 'ERC-721',
+  ERC1155 = 'ERC-1155',
 }
 
 export class GachaStationSDK {
@@ -38,15 +38,15 @@ export class GachaStationSDK {
         const token = ERC20__factory.connect(tokenAddr, this.contract.runner)
         const decimals = await token.decimals()
         rewardAmount = ethers.parseUnits(`${amount}`, decimals)
-        tokenTypeBytes = ethers.keccak256(toUtf8Bytes('ERC20'))
+        tokenTypeBytes = ethers.keccak256(toUtf8Bytes('ERC-20'))
         break
       case TokenType.ERC721:
         rewardAmount = BigInt(amount)
-        tokenTypeBytes = ethers.keccak256(toUtf8Bytes('ERC721'))
+        tokenTypeBytes = ethers.keccak256(toUtf8Bytes('ERC-721'))
         break
       case TokenType.ERC1155:
         rewardAmount = BigInt(amount)
-        tokenTypeBytes = ethers.keccak256(toUtf8Bytes('ERC1155'))
+        tokenTypeBytes = ethers.keccak256(toUtf8Bytes('ERC-1155'))
         break
       default:
         throw new Error('Unsupported token type')

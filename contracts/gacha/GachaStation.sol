@@ -147,11 +147,11 @@ contract GachaStation is IGachaStation, AccessControl {
   function _distribute(address recipient, Reward memory reward) internal {
     if (reward.tokenType == 0x0) {
       _transferEther(recipient, reward.amount);
-    } else if (reward.tokenType == keccak256('ERC20')) {
+    } else if (reward.tokenType == keccak256('ERC-20')) {
       _transferERC20(reward.tokenAddr, recipient, reward.amount);
-    } else if (reward.tokenType == keccak256('ERC721')) {
+    } else if (reward.tokenType == keccak256('ERC-721')) {
       _transferERC721(reward.tokenAddr, recipient, reward.tokenId);
-    } else if (reward.tokenType == keccak256('ERC1155')) {
+    } else if (reward.tokenType == keccak256('ERC-1155')) {
       _transferERC1155(
         reward.tokenAddr,
         recipient,
