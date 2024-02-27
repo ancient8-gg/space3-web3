@@ -26,7 +26,7 @@ export class GachaPaymentSDK {
     const fee = await this.contract.fee()
     let nativeValue = fee + parseEther(`${amount}`)
 
-    if (tokenAddress) {
+    if (tokenAddress !== ethers.ZeroAddress) {
       nativeValue = fee
       const erc20 = ERC20__factory.connect(tokenAddress, this.contract.runner)
       const decimals = (await erc20.decimals()) || 0
