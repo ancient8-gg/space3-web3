@@ -1,3 +1,10 @@
+# [1.0.0-rc.7](https://github.com/ancient8-gg/space3-web3/compare/v1.0.0-rc.6...v1.0.0-rc.7) (2024-02-27)
+
+
+### Features
+
+* expose useful utils contracts ([79274fc](https://github.com/ancient8-gg/space3-web3/commit/79274fce8bfb12028af184df3dd06390a95003e9))
+
 # [1.0.0-rc.6](https://github.com/ancient8-gg/space3-web3/compare/v1.0.0-rc.5...v1.0.0-rc.6) (2024-02-21)
 
 
