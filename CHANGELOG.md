@@ -1,3 +1,10 @@
+# [1.0.0-rc.9](https://github.com/ancient8-gg/space3-web3/compare/v1.0.0-rc.8...v1.0.0-rc.9) (2024-02-28)
+
+
+### Bug Fixes
+
+* use toFixed instead of backtick ([216dade](https://github.com/ancient8-gg/space3-web3/commit/216dadeb6148382e0423cdac15d5d80fda8bb373))
+
 # [1.0.0-rc.8](https://github.com/ancient8-gg/space3-web3/compare/v1.0.0-rc.7...v1.0.0-rc.8) (2024-02-28)
 
 
