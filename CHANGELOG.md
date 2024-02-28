@@ -1,3 +1,10 @@
+# [1.0.0-rc.8](https://github.com/ancient8-gg/space3-web3/compare/v1.0.0-rc.7...v1.0.0-rc.8) (2024-02-28)
+
+
+### Bug Fixes
+
+* check valid token address ([061d262](https://github.com/ancient8-gg/space3-web3/commit/061d26280ca2f1fd34aa3baaaffc34c1b6fff677))
+
 # [1.0.0-rc.7](https://github.com/ancient8-gg/space3-web3/compare/v1.0.0-rc.6...v1.0.0-rc.7) (2024-02-27)
 
 
