@@ -1,4 +1,10 @@
-import { ContractRunner, ethers, parseEther, parseUnits } from 'ethers'
+import {
+  ContractRunner,
+  ethers,
+  parseEther,
+  parseUnits,
+  toNumber,
+} from 'ethers'
 
 import {
   ERC20__factory,
@@ -14,7 +20,7 @@ export class GachaPaymentSDK {
   }
 
   async setFee(fee: number) {
-    return await this.contract.setFee(parseEther(`${fee}`))
+    return await this.contract.setFee(parseEther(fee.toFixed(18)))
   }
 
   async buyTicket(
@@ -22,15 +28,18 @@ export class GachaPaymentSDK {
     amount: number,
     tokenAddress: string = ethers.ZeroAddress,
   ) {
-    let decimalizedAmount = parseEther(`${amount}`)
+    let decimalizedAmount = parseEther(amount.toFixed(18))
     const fee = await this.contract.fee()
-    let nativeValue = fee + parseEther(`${amount}`)
+    let nativeValue = fee + parseEther(amount.toFixed(18))
 
     if (tokenAddress !== ethers.ZeroAddress) {
       nativeValue = fee
       const erc20 = ERC20__factory.connect(tokenAddress, this.contract.runner)
       const decimals = (await erc20.decimals()) || 0
-      decimalizedAmount = parseUnits(`${amount}`, decimals)
+      decimalizedAmount = parseUnits(
+        amount.toFixed(toNumber(decimals)),
+        decimals,
+      )
     }
 
     return await this.contract.buyTicket(

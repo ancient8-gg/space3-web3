@@ -1,4 +1,4 @@
-import { ethers, ContractRunner, toUtf8Bytes } from 'ethers'
+import { ethers, ContractRunner, toUtf8Bytes, toNumber } from 'ethers'
 import {
   ERC20__factory,
   GachaStation,
@@ -31,13 +31,16 @@ export class GachaStationSDK {
 
     switch (tokenType) {
       case TokenType.NATIVE:
-        rewardAmount = ethers.parseEther(`${amount}`)
+        rewardAmount = ethers.parseEther(amount.toFixed(18))
         tokenTypeBytes = ethers.ZeroHash
         break
       case TokenType.ERC20:
         const token = ERC20__factory.connect(tokenAddr, this.contract.runner)
         const decimals = await token.decimals()
-        rewardAmount = ethers.parseUnits(`${amount}`, decimals)
+        rewardAmount = ethers.parseUnits(
+          amount.toFixed(toNumber(decimals)),
+          decimals,
+        )
         tokenTypeBytes = ethers.keccak256(toUtf8Bytes('ERC-20'))
         break
       case TokenType.ERC721:
