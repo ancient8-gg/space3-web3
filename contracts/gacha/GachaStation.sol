@@ -41,7 +41,7 @@ contract GachaStation is IGachaStation, AccessControl {
   function setRewardOwner(
     address owner,
     Reward calldata reward
-  ) public onlyRole(DEFAULT_ADMIN_ROLE) returns (uint256) {
+  ) external payable onlyRole(DEFAULT_ADMIN_ROLE) returns (uint256) {
     // deposit resources
     _deposit(reward);
 
@@ -85,7 +85,9 @@ contract GachaStation is IGachaStation, AccessControl {
     token.safeTransferFrom(address(this), msg.sender, _tokenId);
   }
 
-  // Withdraw ERC-1155
+  /**
+   * @dev Withdraw ERC-1155
+   */
   function withdrawERC1155(
     address _token,
     uint256 _tokenId,
