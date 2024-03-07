@@ -53,13 +53,17 @@ contract GachaStation is IGachaStation, AccessControl {
     return id;
   }
 
-  // Withdraw native token
+  /**
+   * @dev Withdraw native token
+   */
   function withdraw(uint256 _amount) external onlyRole(DEFAULT_ADMIN_ROLE) {
     require(address(this).balance >= _amount, 'Not enough balance!');
     payable(msg.sender).transfer(_amount);
   }
 
-  // Withdraw ERC-20
+  /**
+   * @dev Withdraw ERC-20
+   */
   function withdrawERC20(
     address _token,
     uint256 _amount
@@ -69,7 +73,9 @@ contract GachaStation is IGachaStation, AccessControl {
     token.safeTransfer(msg.sender, _amount);
   }
 
-  // TODO: Withdraw ERC-721
+  /**
+   * @dev Withdraw ERC-721
+   */
   function withdrawERC721(
     address _token,
     uint256 _tokenId
@@ -79,7 +85,7 @@ contract GachaStation is IGachaStation, AccessControl {
     token.safeTransferFrom(address(this), msg.sender, _tokenId);
   }
 
-  // TODO: Withdraw ERC-1155
+  // Withdraw ERC-1155
   function withdrawERC1155(
     address _token,
     uint256 _tokenId,
