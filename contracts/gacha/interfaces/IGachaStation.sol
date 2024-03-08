@@ -44,18 +44,6 @@ interface IGachaStation is IERC721Receiver, IERC1155Receiver {
   );
 
   /* ============ Functions ============ */
-  function deposit() external payable;
-
-  function depositERC20(address token, uint256 amount) external;
-
-  function depositERC721(address token, uint256 tokenId) external;
-
-  function depositERC1155(
-    address token,
-    uint256 tokenId,
-    uint256 amount
-  ) external;
-
   function getRewardOwner(uint256 id) external view returns (address);
 
   function claim(uint256 id, address to) external;
