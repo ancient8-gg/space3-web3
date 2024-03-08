@@ -1,3 +1,17 @@
+# [1.0.0-rc.11](https://github.com/ancient8-gg/space3-web3/compare/v1.0.0-rc.10...v1.0.0-rc.11) (2024-03-08)
+
+
+### Bug Fixes
+
+* add payable to setRewardOwner ([1f35121](https://github.com/ancient8-gg/space3-web3/commit/1f351212e91fcdf55e7a2d01a765fb713fbcecf2))
+
+
+### Features
+
+* add test cases for setRewardOwner ([89919fa](https://github.com/ancient8-gg/space3-web3/commit/89919fa46a1cc327fdf9b0880d201edab4411913))
+* add withdrawing test cases ([42a6452](https://github.com/ancient8-gg/space3-web3/commit/42a6452e8ef4416a82034c1041cfb4a815aa0cf5))
+* remove depositing test cases ([33c416e](https://github.com/ancient8-gg/space3-web3/commit/33c416e312601fef89846b525236b5e49013448f))
+
 # [1.0.0-rc.10](https://github.com/ancient8-gg/space3-web3/compare/v1.0.0-rc.9...v1.0.0-rc.10) (2024-02-28)
 
 
