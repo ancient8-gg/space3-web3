@@ -19,7 +19,7 @@ contract GachaStation is IGachaStation, AccessControl {
   uint256 private _nextRewardId;
   mapping(uint256 => uint256) private _claimedBitMap;
   mapping(uint256 id => address) private _owners;
-  mapping(uint256 id => Reward) private _rewards;
+  mapping(uint256 id => Reward) public rewards;
 
   /* =========== Constructor =========== */
   constructor(address admin) {
@@ -35,47 +35,63 @@ contract GachaStation is IGachaStation, AccessControl {
   }
 
   /* ============ Functions ============ */
-  function deposit() external payable override {
-    emit TokenDeposited(msg.sender, address(0), 0, msg.value);
-  }
-
-  function depositERC20(address _token, uint256 _amount) external override {
-    IERC20(_token).safeTransferFrom(msg.sender, address(this), _amount);
-    emit TokenDeposited(msg.sender, _token, 0, _amount);
-  }
-
-  function depositERC721(address _token, uint256 _tokenId) external override {
-    IERC721(_token).safeTransferFrom(msg.sender, address(this), _tokenId);
-    emit TokenDeposited(msg.sender, _token, _tokenId, 1);
-  }
-
-  function depositERC1155(
-    address _token,
-    uint256 _tokenId,
-    uint256 _amount
-  ) external override {
-    IERC1155(_token).safeTransferFrom(
-      msg.sender,
-      address(this),
-      _tokenId,
-      _amount,
-      ''
-    );
-    emit TokenDeposited(msg.sender, _token, _tokenId, _amount);
-  }
-
   /**
    * @dev Function to set reward owner
    */
   function setRewardOwner(
     address owner,
     Reward calldata reward
-  ) external onlyRole(DEFAULT_ADMIN_ROLE) returns (uint256) {
+  ) external payable onlyRole(DEFAULT_ADMIN_ROLE) {
+    // deposit resources
+    _deposit(reward);
+
+    // set reward owner
     uint256 id = _nextRewardId++;
-    _rewards[id] = reward;
+    rewards[id] = reward;
     _owners[id] = owner;
     emit OwnershipGranted(id, owner);
-    return id;
+  }
+
+  /**
+   * @dev Withdraw native token
+   */
+  function withdraw(uint256 _amount) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    require(address(this).balance >= _amount, 'Not enough balance!');
+    payable(msg.sender).transfer(_amount);
+  }
+
+  /**
+   * @dev Withdraw ERC-20
+   */
+  function withdrawERC20(
+    address _token,
+    uint256 _amount
+  ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    IERC20 token = IERC20(_token);
+    token.safeTransfer(msg.sender, _amount);
+  }
+
+  /**
+   * @dev Withdraw ERC-721
+   */
+  function withdrawERC721(
+    address _token,
+    uint256 _tokenId
+  ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    IERC721 token = IERC721(_token);
+    token.safeTransferFrom(address(this), msg.sender, _tokenId);
+  }
+
+  /**
+   * @dev Withdraw ERC-1155
+   */
+  function withdrawERC1155(
+    address _token,
+    uint256 _tokenId,
+    uint256 _amount
+  ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    IERC1155 token = IERC1155(_token);
+    token.safeTransferFrom(address(this), msg.sender, _tokenId, _amount, '');
   }
 
   /**
@@ -88,7 +104,7 @@ contract GachaStation is IGachaStation, AccessControl {
 
     if (isClaimed(id)) revert AlreadyClaimed(id);
 
-    Reward memory reward = _rewards[id];
+    Reward memory reward = rewards[id];
     _setClaimed(id);
     _distribute(to, reward);
     emit Claimed(id, to);
@@ -139,6 +155,50 @@ contract GachaStation is IGachaStation, AccessControl {
   }
 
   /* ============ Private Functions ============ */
+  function _deposit(Reward memory reward) private {
+    if (reward.tokenType == 0x0) {
+      _depositEther(reward.amount);
+    } else if (reward.tokenType == keccak256('ERC-20')) {
+      _depositERC20(reward.tokenAddr, reward.amount);
+    } else if (reward.tokenType == keccak256('ERC-721')) {
+      _depositERC721(reward.tokenAddr, reward.tokenId);
+    } else if (reward.tokenType == keccak256('ERC-1155')) {
+      _depositERC1155(reward.tokenAddr, reward.tokenId, reward.amount);
+    } else {
+      revert UnsupportedTokenType();
+    }
+  }
+
+  function _depositEther(uint256 amount) private {
+    require(msg.value == amount, 'Incorrect amount of Ether sent!');
+    emit TokenDeposited(msg.sender, address(0), 0, amount);
+  }
+
+  function _depositERC20(address _token, uint256 _amount) private {
+    IERC20(_token).safeTransferFrom(msg.sender, address(this), _amount);
+    emit TokenDeposited(msg.sender, _token, 0, _amount);
+  }
+
+  function _depositERC721(address _token, uint256 _tokenId) private {
+    IERC721(_token).safeTransferFrom(msg.sender, address(this), _tokenId);
+    emit TokenDeposited(msg.sender, _token, _tokenId, 1);
+  }
+
+  function _depositERC1155(
+    address _token,
+    uint256 _tokenId,
+    uint256 _amount
+  ) private {
+    IERC1155(_token).safeTransferFrom(
+      msg.sender,
+      address(this),
+      _tokenId,
+      _amount,
+      ''
+    );
+    emit TokenDeposited(msg.sender, _token, _tokenId, _amount);
+  }
+
   /**
    * @dev Distributes rewards based on the reward type. Supports Ether, ERC20, ERC721, and ERC1155 tokens.
    * @param recipient The address to receive the reward.
@@ -209,4 +269,8 @@ contract GachaStation is IGachaStation, AccessControl {
       _claimedBitMap[claimedWordIdx] |
       (1 << claimedBitIdx);
   }
+
+  fallback() external payable {}
+
+  receive() external payable {}
 }
