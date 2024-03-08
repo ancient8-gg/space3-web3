@@ -68,7 +68,6 @@ contract GachaStation is IGachaStation, AccessControl {
     uint256 _amount
   ) external onlyRole(DEFAULT_ADMIN_ROLE) {
     IERC20 token = IERC20(_token);
-    require(token.balanceOf(address(this)) >= _amount, 'Not enough balance!');
     token.safeTransfer(msg.sender, _amount);
   }
 
@@ -80,7 +79,6 @@ contract GachaStation is IGachaStation, AccessControl {
     uint256 _tokenId
   ) external onlyRole(DEFAULT_ADMIN_ROLE) {
     IERC721 token = IERC721(_token);
-    require(token.ownerOf(_tokenId) == address(this), 'Not enough balance!');
     token.safeTransferFrom(address(this), msg.sender, _tokenId);
   }
 
@@ -93,10 +91,6 @@ contract GachaStation is IGachaStation, AccessControl {
     uint256 _amount
   ) external onlyRole(DEFAULT_ADMIN_ROLE) {
     IERC1155 token = IERC1155(_token);
-    require(
-      token.balanceOf(address(this), _tokenId) >= _amount,
-      'Not enough balance!'
-    );
     token.safeTransferFrom(address(this), msg.sender, _tokenId, _amount, '');
   }
 
