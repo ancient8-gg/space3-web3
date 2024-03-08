@@ -41,7 +41,7 @@ contract GachaStation is IGachaStation, AccessControl {
   function setRewardOwner(
     address owner,
     Reward calldata reward
-  ) external payable onlyRole(DEFAULT_ADMIN_ROLE) returns (uint256) {
+  ) external payable onlyRole(DEFAULT_ADMIN_ROLE) {
     // deposit resources
     _deposit(reward);
 
@@ -50,7 +50,6 @@ contract GachaStation is IGachaStation, AccessControl {
     rewards[id] = reward;
     _owners[id] = owner;
     emit OwnershipGranted(id, owner);
-    return id;
   }
 
   /**
