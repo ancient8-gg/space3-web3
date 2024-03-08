@@ -1,6 +1,13 @@
 import { expect } from 'chai'
 import { ethers } from 'hardhat'
-import { parseEther, keccak256, toUtf8Bytes, parseUnits } from 'ethers'
+import {
+  parseEther,
+  keccak256,
+  toUtf8Bytes,
+  parseUnits,
+  ZeroAddress,
+  ZeroHash,
+} from 'ethers'
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers'
 
 describe('GachaStation', function () {
@@ -25,7 +32,7 @@ describe('GachaStation', function () {
     // Setup ERC721
     const ERC721Factory = await ethers.getContractFactory('ERC721T')
     const erc721Token = await ERC721Factory.deploy('A8NFT', 'A8NFT', owner)
-    await erc721Token.safeMint(owner.address)
+    await erc721Token.safeMint(owner.address, 0)
 
     // Setup ERC1155
     const ERC1155Factory = await ethers.getContractFactory('ERC1155T')
@@ -75,26 +82,58 @@ describe('GachaStation', function () {
       )
     })
 
-    it('Should set a reward correctly & emit an event', async function () {
-      const { station, wallet0, erc20Token } = await loadFixture(
+    it('Should allow the admin to set Native token rewards successfully', async function () {
+      const { station, wallet0 } = await loadFixture(deployGachaStationFixture)
+      const txAmount = parseEther('1')
+      const reward = {
+        tokenId: 0,
+        tokenAddr: ZeroAddress,
+        amount: txAmount,
+        tokenType: ZeroHash,
+      }
+
+      // process to set reward
+      await expect(
+        await station.setRewardOwner(wallet0.address, reward, {
+          value: txAmount,
+        }),
+      )
+        .to.emit(station, 'OwnershipGranted')
+        .withArgs(0, wallet0.address)
+
+      expect(await ethers.provider.getBalance(station)).to.be.equal(txAmount)
+      expect(await station.getRewardOwner(0)).to.be.equal(wallet0.address)
+    })
+
+    it('Should allow the admin to set ERC-20 rewards successfully', async function () {
+      const { station, owner, wallet0, erc20Token } = await loadFixture(
         deployGachaStationFixture,
       )
 
       const tokenAddr = await erc20Token.getAddress()
+      const tokenDecimals = await erc20Token.decimals()
+      const txAmount = parseUnits('1', tokenDecimals)
       const reward = {
         tokenId: 0,
         tokenAddr,
-        amount: 100,
+        amount: txAmount,
         tokenType: keccak256(toUtf8Bytes('ERC-20')),
       }
+
+      // pre-test
+      await erc20Token.connect(owner).approve(station, txAmount)
+
+      // process to set reward
       await expect(await station.setRewardOwner(wallet0.address, reward))
         .to.emit(station, 'OwnershipGranted')
         .withArgs(0, wallet0.address)
+
+      expect(await erc20Token.balanceOf(station)).to.be.equal(txAmount)
       expect(await station.getRewardOwner(0)).to.be.equal(wallet0.address)
     })
 
-    it('Should allow the admin to set ERC721 rewards successfully', async function () {
-      const { station, wallet0, erc721Token } = await loadFixture(
+    it('Should allow the admin to set ERC-721 rewards successfully', async function () {
+      const { station, owner, wallet0, erc721Token } = await loadFixture(
         deployGachaStationFixture,
       )
       const tokenAddr = await erc721Token.getAddress()
@@ -105,28 +144,131 @@ describe('GachaStation', function () {
         tokenType: keccak256(toUtf8Bytes('ERC-721')),
       }
 
+      // pre-test
+      await erc721Token.connect(owner).approve(station, 0)
+
+      // process to set reward
       await expect(await station.setRewardOwner(wallet0.address, reward))
         .to.emit(station, 'OwnershipGranted')
         .withArgs(0, wallet0.address)
+      expect(await erc721Token.balanceOf(station)).to.be.equal(1)
       expect(await station.getRewardOwner(0)).to.be.equal(wallet0.address)
     })
 
-    it('Should allow the admin to set ERC1155 rewards successfully', async function () {
-      const { station, wallet0, erc1155Token } = await loadFixture(
+    it('Should allow the admin to set ERC-1155 rewards successfully', async function () {
+      const { station, owner, wallet0, erc1155Token } = await loadFixture(
         deployGachaStationFixture,
       )
       const tokenAddr = await erc1155Token.getAddress()
       const reward = {
+        tokenId: 1,
+        tokenAddr,
+        amount: 1,
+        tokenType: keccak256(toUtf8Bytes('ERC-1155')),
+      }
+      // pre-test
+      await erc1155Token.connect(owner).setApprovalForAll(station, true)
+
+      // process to set reward
+      await expect(await station.setRewardOwner(wallet0.address, reward))
+        .to.emit(station, 'OwnershipGranted')
+        .withArgs(0, wallet0.address)
+      expect(await erc1155Token.balanceOf(station, 1)).to.be.equal(1)
+      expect(await station.getRewardOwner(0)).to.be.equal(wallet0.address)
+    })
+
+    it('Should fail to set reward Native token due to insufficient balance', async function () {
+      const { station, owner, wallet0 } = await loadFixture(
+        deployGachaStationFixture,
+      )
+      const adminBalance = await ethers.provider.getBalance(owner)
+      const txAmount = adminBalance + 100n
+      const reward = {
         tokenId: 0,
+        tokenAddr: ZeroAddress,
+        amount: txAmount,
+        tokenType: ZeroHash,
+      }
+
+      // process to set reward
+      await expect(
+        station.setRewardOwner(wallet0.address, reward, {
+          value: txAmount,
+        }),
+      ).to.be.rejectedWith("sender doesn't have enough funds to send tx")
+    })
+
+    it('Should fail to set reward ERC-20 due to insufficient balance', async function () {
+      const { station, owner, wallet0, erc20Token } = await loadFixture(
+        deployGachaStationFixture,
+      )
+
+      const tokenAddr = await erc20Token.getAddress()
+      const txAmount = parseEther('10000000000')
+      const reward = {
+        tokenId: 0,
+        tokenAddr,
+        amount: txAmount,
+        tokenType: keccak256(toUtf8Bytes('ERC-20')),
+      }
+
+      // pre-test
+      await erc20Token.connect(owner).approve(station, txAmount)
+
+      // process to set reward
+      await expect(
+        station.setRewardOwner(wallet0.address, reward),
+      ).to.be.revertedWithCustomError(erc20Token, 'ERC20InsufficientBalance')
+    })
+
+    it('Should fail to set reward ERC-721 due to admin have no that token', async function () {
+      const { station, owner, wallet0, erc721Token } = await loadFixture(
+        deployGachaStationFixture,
+      )
+      const tokenAddr = await erc721Token.getAddress()
+      const txTokenId = 100
+      const reward = {
+        tokenId: txTokenId,
+        tokenAddr,
+        amount: 1,
+        tokenType: keccak256(toUtf8Bytes('ERC-721')),
+      }
+
+      // pre-test
+      await erc721Token.connect(owner).safeMint(wallet0.address, txTokenId)
+
+      // process to set reward
+      expect(
+        erc721Token.connect(owner).approve(station, txTokenId),
+      ).to.be.revertedWithCustomError(erc721Token, 'ERC721InvalidApprover')
+      expect(
+        station.setRewardOwner(wallet0.address, reward),
+      ).to.be.revertedWithCustomError(erc721Token, 'ERC721InsufficientApproval')
+    })
+
+    it('Should fail to set reward ERC-1155 due to admin have no that token', async function () {
+      const { station, owner, wallet0, erc1155Token } = await loadFixture(
+        deployGachaStationFixture,
+      )
+      const tokenAddr = await erc1155Token.getAddress()
+      const txTokenId = 100
+      const reward = {
+        tokenId: txTokenId,
         tokenAddr,
         amount: 1,
         tokenType: keccak256(toUtf8Bytes('ERC-1155')),
       }
 
-      await expect(await station.setRewardOwner(wallet0.address, reward))
-        .to.emit(station, 'OwnershipGranted')
-        .withArgs(0, wallet0.address)
-      expect(await station.getRewardOwner(0)).to.be.equal(wallet0.address)
+      // pre-test
+      await erc1155Token
+        .connect(owner)
+        .mint(wallet0.address, txTokenId, 10, '0x')
+
+      // process to set reward
+      expect(
+        erc1155Token.connect(owner).setApprovalForAll(station, true),
+      ).to.be.revertedWithCustomError(erc1155Token, 'ERC1155InvalidApprover')
+      expect(station.setRewardOwner(wallet0.address, reward)).to.be.reverted
     })
   })
 
@@ -146,7 +288,6 @@ describe('GachaStation', function () {
       // Deposit resources
       const amount = parseEther('1')
       await erc20Token.connect(owner).approve(station, amount)
-      await station.connect(owner).depositERC20(erc20Token, amount)
 
       // Set reward
       await station.setRewardOwner(wallet0.address, reward)
@@ -173,7 +314,6 @@ describe('GachaStation', function () {
       }
       // Deposit resources to the contract
       await erc721Token.connect(owner).approve(station, 0)
-      await station.connect(owner).depositERC721(erc721Token, 0)
 
       // Set reward
       await station.setRewardOwner(wallet0.address, reward)
@@ -200,7 +340,6 @@ describe('GachaStation', function () {
       }
       // Deposit resources to the contract
       await erc1155Token.connect(owner).setApprovalForAll(station, true)
-      await station.connect(owner).depositERC1155(erc1155Token, 1, 1)
 
       // Set reward
       await station.setRewardOwner(wallet0.address, reward)
@@ -229,7 +368,6 @@ describe('GachaStation', function () {
       // Deposit resources
       const amount = parseEther('1')
       await erc20Token.connect(owner).approve(station, amount)
-      await station.connect(owner).depositERC20(erc20Token, amount)
 
       // Set reward
       await station.setRewardOwner(wallet0.address, reward)
@@ -332,7 +470,7 @@ describe('GachaStation', function () {
         .withdrawERC1155(erc1155Token, 1, 10)
       const ownerBalance = await erc1155Token.balanceOf(owner, 1)
       const stationBalance = await erc1155Token.balanceOf(station, 1)
-      console.log(ownerBalance, stationBalance)
+
       expect(ownerBalance).to.eql(100n)
       expect(stationBalance).to.eql(0n)
     })
@@ -348,123 +486,6 @@ describe('GachaStation', function () {
 
       await expect(station.connect(others).withdrawERC1155(erc1155Token, 1, 10))
         .to.be.reverted
-    })
-
-    it('Should let a user claim a ECR20 reward', async function () {
-      const { station, owner, wallet0, erc20Token } = await loadFixture(
-        deployGachaStationFixture,
-      )
-
-      const tokenAddr = await erc20Token.getAddress()
-      const reward = {
-        tokenId: 0,
-        tokenAddr,
-        amount: 1,
-        tokenType: keccak256(toUtf8Bytes('ERC-20')),
-      }
-      // Deposit resources
-      const amount = parseEther('1')
-      await erc20Token.connect(owner).approve(station, amount)
-      await station.connect(owner).depositERC20(amount)
-
-      // Set reward
-      await station.setRewardOwner(wallet0.address, reward)
-      expect(await station.isClaimed(0)).to.be.equal(false)
-
-      // Claim reward
-      const claimTx = await station.connect(wallet0).claim(0, wallet0.address)
-      await expect(claimTx).to.emit(station, 'Claimed')
-      expect(await station.isClaimed(0)).to.be.equal(true)
-      expect(await station.getRewardOwner(0)).to.be.equal(wallet0.address)
-    })
-
-    it('Should let a user claim a ERC721 reward', async function () {
-      const { station, owner, wallet0, erc721Token } = await loadFixture(
-        deployGachaStationFixture,
-      )
-
-      const tokenAddr = await erc721Token.getAddress()
-      const reward = {
-        tokenId: 0,
-        tokenAddr,
-        amount: 1,
-        tokenType: keccak256(toUtf8Bytes('ERC-721')),
-      }
-      // Deposit resources to the contract
-      await erc721Token.connect(owner).approve(station, 0)
-      await station.connect(owner).depositERC721(erc721Token, 0)
-
-      // Set reward
-      await station.setRewardOwner(wallet0.address, reward)
-      expect(await station.isClaimed(0)).to.be.equal(false)
-
-      // Claim reward
-      const claimTx = await station.connect(wallet0).claim(0, wallet0.address)
-      await expect(claimTx).to.emit(station, 'Claimed')
-      expect(await station.isClaimed(0)).to.be.equal(true)
-      expect(await station.getRewardOwner(0)).to.be.equal(wallet0.address)
-    })
-
-    it('Should let a user claim a ERC1155 reward', async function () {
-      const { station, owner, wallet0, erc1155Token } = await loadFixture(
-        deployGachaStationFixture,
-      )
-
-      const tokenAddr = await erc1155Token.getAddress()
-      const reward = {
-        tokenId: 1,
-        tokenAddr,
-        amount: 1,
-        tokenType: keccak256(toUtf8Bytes('ERC-1155')),
-      }
-      // Deposit resources to the contract
-      await erc1155Token.connect(owner).setApprovalForAll(station, true)
-      await station.connect(owner).depositERC1155(erc1155Token, 1, 1)
-
-      // Set reward
-      await station.setRewardOwner(wallet0.address, reward)
-      expect(await station.isClaimed(0)).to.be.equal(false)
-
-      // Claim reward
-      const claimTx = await station.connect(wallet0).claim(0, wallet0.address)
-      await expect(claimTx).to.emit(station, 'Claimed')
-      expect(await station.isClaimed(0)).to.be.equal(true)
-      expect(await station.getRewardOwner(0)).to.be.equal(wallet0.address)
-    })
-
-    it('Should fail if a reward is already claimed', async function () {
-      const { station, owner, wallet0, erc20Token } = await loadFixture(
-        deployGachaStationFixture,
-      )
-
-      const tokenAddr = await erc20Token.getAddress()
-      const reward = {
-        tokenId: 0,
-        tokenAddr,
-        amount: 1,
-        tokenType: keccak256(toUtf8Bytes('ERC-20')),
-      }
-
-      // Deposit resources
-      const amount = parseEther('1')
-      await erc20Token.connect(owner).approve(station, amount)
-      await station.connect(owner).depositERC20(erc20Token, amount)
-
-      // Set reward
-      await station.setRewardOwner(wallet0.address, reward)
-      expect(await station.isClaimed(0)).to.be.equal(false)
-
-      // Claim reward
-      const stationAddr = await station.getAddress()
-      await erc20Token.connect(owner).approve(stationAddr, parseEther('100'))
-      const tx = await station.connect(wallet0).claim(0, wallet0.address)
-      await expect(tx).to.emit(station, 'Claimed')
-      expect(await station.isClaimed(0)).to.be.equal(true)
-
-      // Dupplicate claim
-      await expect(
-        station.connect(wallet0).claim(0, wallet0.address),
-      ).to.be.revertedWithCustomError(station, 'AlreadyClaimed')
     })
   })
 })

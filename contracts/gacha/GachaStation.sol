@@ -276,4 +276,8 @@ contract GachaStation is IGachaStation, AccessControl {
       _claimedBitMap[claimedWordIdx] |
       (1 << claimedBitIdx);
   }
+
+  fallback() external payable {}
+
+  receive() external payable {}
 }
