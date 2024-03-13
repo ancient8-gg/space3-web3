@@ -4,6 +4,7 @@ import {
   GachaStation,
   GachaStation__factory,
 } from '../typechain'
+import { PayableOverrides } from '../typechain/common'
 
 export enum TokenType {
   NATIVE = 'NATIVE',
@@ -26,49 +27,59 @@ export class GachaStationSDK {
     tokenAddr: string = ethers.ZeroAddress,
     tokenType: TokenType,
   ) {
-    let rewardAmount = 0n
-    let tokenTypeBytes: string
+    const { reward, overrides } = await this.standardize(
+      amount,
+      tokenId,
+      tokenAddr,
+      tokenType,
+    )
+    return await this.contract.setRewardOwner.populateTransaction(
+      ownerAddress,
+      reward,
+      overrides,
+    )
+  }
+
+  private async standardize(
+    amount: number,
+    tokenId: number,
+    tokenAddr: string,
+    tokenType: TokenType,
+  ) {
+    let txAmount = 0n
+    let txTokenType: string
+    const overrides: PayableOverrides = {}
 
     switch (tokenType) {
       case TokenType.NATIVE:
-        rewardAmount = ethers.parseEther(amount.toFixed(18))
-        const reward = {
-          amount: rewardAmount,
-          tokenId,
-          tokenAddr,
-          tokenType: ethers.ZeroHash,
-        }
-        return await this.contract.setRewardOwner(ownerAddress, reward, {
-          value: rewardAmount,
-        })
+        txAmount = ethers.parseEther(amount.toFixed(18))
+        txTokenType = ethers.ZeroHash
+        overrides.value = txAmount
+        break
       case TokenType.ERC20:
         const token = ERC20__factory.connect(tokenAddr, this.contract.runner)
         const decimals = await token.decimals()
-        rewardAmount = ethers.parseUnits(
+        txAmount = ethers.parseUnits(
           amount.toFixed(toNumber(decimals)),
           decimals,
         )
-        tokenTypeBytes = ethers.keccak256(toUtf8Bytes('ERC-20'))
+        txTokenType = ethers.keccak256(toUtf8Bytes('ERC-20'))
         break
       case TokenType.ERC721:
-        rewardAmount = BigInt(amount)
-        tokenTypeBytes = ethers.keccak256(toUtf8Bytes('ERC-721'))
+        txAmount = BigInt(amount)
+        txTokenType = ethers.keccak256(toUtf8Bytes('ERC-721'))
         break
       case TokenType.ERC1155:
-        rewardAmount = BigInt(amount)
-        tokenTypeBytes = ethers.keccak256(toUtf8Bytes('ERC-1155'))
+        txAmount = BigInt(amount)
+        txTokenType = ethers.keccak256(toUtf8Bytes('ERC-1155'))
         break
       default:
         throw new Error('Unsupported token type')
     }
 
-    const reward = {
-      amount: rewardAmount,
-      tokenId,
-      tokenAddr,
-      tokenType: tokenTypeBytes,
+    return {
+      reward: { amount: txAmount, tokenId, tokenAddr, tokenType: txTokenType },
+      overrides,
     }
-
-    return await this.contract.setRewardOwner(ownerAddress, reward)
   }
 }
