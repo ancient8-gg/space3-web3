@@ -1,3 +1,10 @@
+# [1.0.0-rc.12](https://github.com/ancient8-gg/space3-web3/compare/v1.0.0-rc.11...v1.0.0-rc.12) (2024-03-13)
+
+
+### Bug Fixes
+
+* add msg value for set native token ([1524320](https://github.com/ancient8-gg/space3-web3/commit/152432020db066914adf0aa1ad34c82f77242dd1))
+
 # [1.0.0-rc.11](https://github.com/ancient8-gg/space3-web3/compare/v1.0.0-rc.10...v1.0.0-rc.11) (2024-03-08)
 
 
