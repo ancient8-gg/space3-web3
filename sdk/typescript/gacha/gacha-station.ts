@@ -32,8 +32,15 @@ export class GachaStationSDK {
     switch (tokenType) {
       case TokenType.NATIVE:
         rewardAmount = ethers.parseEther(amount.toFixed(18))
-        tokenTypeBytes = ethers.ZeroHash
-        break
+        const reward = {
+          amount: rewardAmount,
+          tokenId,
+          tokenAddr,
+          tokenType: ethers.ZeroHash,
+        }
+        return await this.contract.setRewardOwner(ownerAddress, reward, {
+          value: rewardAmount,
+        })
       case TokenType.ERC20:
         const token = ERC20__factory.connect(tokenAddr, this.contract.runner)
         const decimals = await token.decimals()
