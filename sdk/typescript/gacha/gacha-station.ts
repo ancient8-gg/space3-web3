@@ -27,7 +27,23 @@ export class GachaStationSDK {
     tokenAddr: string = ethers.ZeroAddress,
     tokenType: TokenType,
   ) {
-    const { reward, overrides } = await this.standardize(
+    const { reward, overrides } = await this.getSetRewardOwnerParams(
+      amount,
+      tokenId,
+      tokenAddr,
+      tokenType,
+    )
+    return await this.contract.setRewardOwner(ownerAddress, reward, overrides)
+  }
+
+  public async populateSetRewardOwnerTx(
+    ownerAddress: string,
+    amount: number,
+    tokenId: number = 0,
+    tokenAddr: string = ethers.ZeroAddress,
+    tokenType: TokenType,
+  ) {
+    const { reward, overrides } = await this.getSetRewardOwnerParams(
       amount,
       tokenId,
       tokenAddr,
@@ -40,7 +56,7 @@ export class GachaStationSDK {
     )
   }
 
-  private async standardize(
+  private async getSetRewardOwnerParams(
     amount: number,
     tokenId: number,
     tokenAddr: string,
