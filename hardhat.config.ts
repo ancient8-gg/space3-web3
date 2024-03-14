@@ -37,6 +37,13 @@ const config: HardhatUserConfig = {
       saveDeployments: true,
       allowUnlimitedContractSize: false,
     },
+    ancient8Mainnet: {
+      url: 'https://rpc.ancient8.gg',
+      chainId: 888888888,
+      accounts: ACCOUNTS,
+      saveDeployments: true,
+      allowUnlimitedContractSize: false,
+    },
   },
   namedAccounts: {
     deployer: {
@@ -67,6 +74,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://scanv2-testnet.ancient8.gg/api',
           browserURL: 'https://scanv2-testnet.ancient8.gg',
+        },
+      },
+      {
+        network: 'ancient8Mainnet',
+        chainId: 888888888,
+        urls: {
+          apiURL: 'https://scan.ancient8.gg/api',
+          browserURL: 'https://scan.ancient8.gg',
         },
       },
     ],
