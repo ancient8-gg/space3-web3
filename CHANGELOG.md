@@ -1,3 +1,11 @@
+# [1.0.0-rc.13](https://github.com/ancient8-gg/space3-web3/compare/v1.0.0-rc.12...v1.0.0-rc.13) (2024-03-14)
+
+
+### Features
+
+* add populate tx function ([6a45567](https://github.com/ancient8-gg/space3-web3/commit/6a45567be2d52c8b8ab4847e8bf379c381c5406f))
+* return an unsigned tx on setting reward ([32f4fb8](https://github.com/ancient8-gg/space3-web3/commit/32f4fb896993d404f2e443504ec499afa4db1e23))
+
 # [1.0.0-rc.12](https://github.com/ancient8-gg/space3-web3/compare/v1.0.0-rc.11...v1.0.0-rc.12) (2024-03-13)
 
 
