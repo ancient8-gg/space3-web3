@@ -58,6 +58,7 @@ const config: HardhatUserConfig = {
     apiKey: {
       ancient8Testnet: process.env.ANCIENT8_TESTNET_API_KEY || '',
       ancient8TestnetV2: process.env.ANCIENT8_TESTNET_V2_API_KEY || '',
+      ancient8Mainnet: process.env.ANCIENT8_MAINNET_API_KEY || '',
     },
     customChains: [
       {
